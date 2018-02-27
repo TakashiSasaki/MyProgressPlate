@@ -21,23 +21,47 @@ var mouseDownElement;
 var divStrips;
 var divMenu;
 var jsonStrips = {};
-var divStrips = {};
+var stripDivs = {};
+
+var jsonStripTemplate = {
+    stripId: null,
+    dirty: false,
+    imgIcon: null,
+    className: null,
+    stripTitle: "no title",
+    dirty: true
+};
+
+function loadStrips(){
+    jsonStrips = {};
+    stripDivs = {};
+    for(var i=0; i<window.localStorage.length; ++i) {
+        const stringJson = window.localStorage.getItem(window.localStorage.key(i));
+        if(typeof stringJson !== "string") {
+            throw "loadStrips: stringJson is not a string";
+        }
+        const jsonStrip = JSON.parse(stringJson);
+        if(!(jsonStrip instanceof Object)){
+            throw "loadStrips: jsonStrip is not an object.";
+        }
+        jsonStrips[jsonStrip.stripId] = jsonStrip;
+        const divStrip = buildDivStrip(jsonStrip);
+        stripDivs[jsonStrip.stripId] = divStrip;
+    }
+    if(Object.keys(jsonStrips).length === 0) {
+        createNewStrip();
+    }
+}
 
 setTimeout(function(){
     divStrips = document.getElementById("divStrips");
-    for(var i=0; i<100; ++i){
-        const stringJson = window.localStorage.getItem(i);
-        if(typeof stringJson !== "string") continue;
-        const jsonStrip = JSON.parse(stringJson);
-        const divStrip = buildDivStrip(jsonStrip);
-        divStrips.appendChild(divStrip);
-    }
-    if(divStrips.children.length === 0){
-        var newStripDiv = buildDivStrip();
-        divStrips.appendChild(newStripDiv);
-    }
     divMenu = document.getElementById("menu");
-    
+    loadStrips(i);
+    for(var i in stripDivs) {
+        if(stripDivs[i] instanceof HTMLElement) {
+            divStrips.appendChild(stripDivs[i]);
+        }
+    }
 }, 100);
 
 function dblclick(element,mouseEvent){
@@ -78,38 +102,27 @@ function touchend(element,touchEvent){
     console.log("touchend:" + touchEndElement);
 }
 
-function loadJsonStrips(stripId){
-}
 
-function saveJsonStrips(){
-}
-
-function getStripJson(stripId){
-    if(stripId === undefined) {
-        stripId = divStrips.children.length;
-    }
-    var jsonString = window.localStorage.getItem(stripId);
-    var stripJson;
-    if(jsonString === "string"){
-        stripJson = JSON.parse(jsonString);
+function createNewStrip(){
+    const stripIds = Object.keys(jsonStrips);
+    var newStripId;
+    if(stripIds.length === 0) {
+        newStripId = 0;
     } else {
-        stripJson = {
-            stripId: stripId,
-            dirty: false,
-            imgIcon: null,
-            className: null,
-            stripTitle: "no title"
-        };
-        window.localStorage.setItem(stripId, JSON.stringify(stripJson));
+        newStripId = Math.max.apply(null, Object.keys(stripIds)) + 1;
     }
-    return stripJson;
+    const newJsonStrip = Object.assign({}, jsonStripTemplate);
+    newJsonStrip.stripId = newStripId;
+    jsonStrips[newStripId] = newJsonStrip;
+    const newDivStrip = buildDivStrip(newJsonStrip);
+    stripDivs[newStripId] = newDivStrip;
+    window.localStorage.setItem(newStripId, JSON.stringify(newJsonStrip));
+    return newStripId;
 }
 
-function insertNewStripDiv(event){
-    var newStripDiv = buildDivStrip();
-    var stripDiv = getStripDiv(event.target.dataset.stripId);
-    divStrips.insertBefore(newStripDiv, stripDiv);
-    toggleMenu();
+function addNewStrip(event){
+    var newStripId = createNewStrip();
+    divStrips.insertBefore(stripDivs[newStripId], stripDivs[event.target.dataset.stripId]);
 }
 
 function archiveDivStrip(event){
@@ -120,20 +133,21 @@ function archiveDivStrip(event){
 }
 
 function buildDivStrip(stripJson){
-    if(stripJson === undefined) stripJson = getStripJson();
-    if(!(stripJson instanceof Object)) throw "buildDivStrip: stripJson is not an object";
+    if(!(stripJson instanceof Object)) {
+        alert(stripJson);
+        throw "buildDivStrip: stripJson is not an object";
+    }
     var newDivStrip = document.createElement("div");
     newDivStrip.classList.add("btn");
     newDivStrip.classList.add("btn-primary");
     newDivStrip.classList.add("form-group");
     newDivStrip.classList.add("divStrip");
     newDivStrip.classList.add(stripJson.className);
-    newDivStrip.dataset.stripId = stripJson.stripId;
 
     var spanStatus = document.createElement("span");
     spanStatus.classList.add("status");
     spanStatus.classList.add("checked");
-    spanStatus.innerHTML= stripJson.stripId;
+    spanStatus.classList.add("stripId");
     spanStatus.addEventListener("dblclick", toggleMenu);
     newDivStrip.appendChild(spanStatus);
     
@@ -141,7 +155,6 @@ function buildDivStrip(stripJson){
         var imgIcon = document.createElement("img");
         imgIcon.src = stripJson.imgIcon;
         imgIcon.classList.add("imgIcon");
-        imgIcon.dataset.stripId = stripJson.stripId;
         newDivStrip.appendChild(imgIcon);
     }
         
@@ -152,7 +165,6 @@ function buildDivStrip(stripJson){
     inputStripTitle.readOnly = true;
     inputStripTitle.addEventListener("dblclick", toggleReadOnly);
     inputStripTitle.addEventListener("change", saveStripTitle);
-    inputStripTitle.dataset.stripId = stripJson.stripId;
     newDivStrip.appendChild(inputStripTitle);
     
     
@@ -161,19 +173,11 @@ function buildDivStrip(stripJson){
     buttonAddStrip.classList.add("btn");
     buttonAddStrip.classList.add("btn-default");
     buttonAddStrip.addEventListener("click", toggleMenu);
-    buttonAddStrip.dataset.stripId = stripJson.stripId;
     newDivStrip.appendChild(buttonAddStrip);
     
+    setStripId(newDivStrip, stripJson.stripId)
+    
     return newDivStrip;
-}
-
-function getStripDiv(stripId){
-    for(var i=0; i<divStrips.children.length; ++i) {
-        var stripDiv = divStrips.children[i];
-        if(stripDiv.dataset.stripId === stripId) {
-            return stripDiv;
-        }
-    }
 }
 
 function getChildWithClass(parentElement, className) {
@@ -206,16 +210,24 @@ function toggleMenu(event){
         divMenu.style.display = "block";
         divMenu.style.top = "5em";
         divMenu.style.left = "10%";
-        for(var i=0; i<divMenu.children.length; ++i) {
-            divMenu.children[i].dataset.stripId = divMenu.dataset.stripId;
-            for(var j=0; j<divMenu.children[i].children.length; ++j){
-                divMenu.children[i].children[j].dataset.stripId = divMenu.dataset.stripId;
-                if(divMenu.children[i].children[j].classList.contains("stripId")){
-                    divMenu.children[i].children[j].innerHTML=divMenu.dataset.stripId;
-                }           
-            }
-        }
+        setStripId(divMenu, event.target.dataset.stripId);
     } else {
         divMenu.style.display = "none";
+    }
+}
+
+
+function setStripId(element, stripId){
+    for(var i=0; i<element.children.length; ++i) {
+        element.children[i].dataset.stripId = stripId;
+        if(element.children[i].classList.contains("stripId")){
+            element.children[i].innerHTML=stripId;
+        }           
+        for(var j=0; j<element.children[i].children.length; ++j){
+            element.children[i].children[j].dataset.stripId = stripId;
+            if(element.children[i].children[j].classList.contains("stripId")){
+                element.children[i].children[j].innerHTML=stripId;
+            }           
+        }
     }
 }
