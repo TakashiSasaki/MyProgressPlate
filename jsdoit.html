@@ -1,6 +1,6 @@
 <div id="divStrips"></div>
 <div id="divMenu" class="menu panel panel-info">
-   <div class="panel-heading" onclick="divMenu.style.display='none'">
+   <div class="panel-heading">
       <h1 class="stripId panel-title">Edit the strip</h1>
       <button class="btn btn-default" onclick="insertNewStrip(event)">New</button>
       <button class="btn btn-default" onclick="archiveStrip(event)">Archive</button>
@@ -8,12 +8,14 @@
       <button  onclick="divMenu.style.display='none'" class="btn btn-default">Cancel</button>        
    </div>
    <div class="panel-body">
-      <input placeholder="title" class="form-control" id="inputStripTitle">
-      <input placeholder="URL to open" class="form-control"ondblclick="openUrl(event)" id="inputUrl">
-      <h2>Current due time</h2>
-       <div class="form-control"></div>
+      <form class="form-horizontal">
+          <div class="form-group"><label class="control-label col-xs-1">Title</label><div class="col-xs-11"><input placeholder="title" class="form-control" id="inputStripTitle"></div></div>
+          <div class="form-group"><label class="control-label col-xs-1">URL</label><div class="col-xs-11"><input placeholder="URL to open" class="form-control"ondblclick="openUrl(event)" id="inputUrl"></div></div>
+          <div class="form-group"><label class="control-label col-xs-1">Last</label><div class="col-xs-11"><div class="form-control" id="divLastOpened"></div></div></div>
+          <div class="form-group"><label class="control-label col-xs-1">Next</label><div class="col-xs-11"><div class="form-control" id="divDueDateTime"></div></div></div>
+      </form>
       <div>
-         <h2>Put off</h2>
+         <h2 onclick="toggleNextSibling(event)">Put off</h2>
           <div class="form-group" id="divPutOff">
             <button class="btn btn-default" value="1800">30min</button>
             <button class="btn btn-default" value="3600">1h</button>
@@ -29,7 +31,8 @@
             <button class="btn btn-default" value="1814400">3w</button>
             <button class="btn btn-default" value="2419200">4w</button>
          </div>
-          <h2>Renew after</h2>
+          <h2 onclick="toggleNextSibling(event)">Renew after</h2>
+          <div class="form-group" id="divRenewAfter(event)">
             <label>30min<input type="radio" class="form-control" value="1800" name="renewAfter"></label>
             <label>1h<input type="radio" class="form-control" value="3600" name="renewAfter"></label>
             <label>2h<input type="radio" class="form-control" value="7200" name="renewAfter"></label>
@@ -43,7 +46,9 @@
             <label>2w<input type="radio" class="form-control" value="1209600" name="renewAfter"></label>
             <label>3w<input type="radio" class="form-control" value="1814400" name="renewAfter"></label>
             <label>4w<input type="radio" class="form-control" value="2419200" name="renewAfter"></label>
-         <h2>Renew every</h2>
+          </div>
+         <h2 onclick="toggleNextSibling(event)">Renew every</h2>
+          <div class="form-group" id="divRenewEvery">
             <label>0am<input type="checkbox" class="form-control" value="86400" name="renewEveryHours"></label>
             <label>3am<input type="checkbox" class="form-control" value="10800" name="renewEveryHours"></label>
             <label>6am<input type="checkbox" class="form-control" value="21600" name="renewEveryHours"></label>          
@@ -59,6 +64,7 @@
             <label>Thu<input type="checkbox" class="form-control" value="4" name="renewDayOfWeek"></label>
             <label>Fri<input type="checkbox" class="form-control" value="5" name="renewDayOfWeek"></label>
             <label>Sat<input type="checkbox" class="form-control" value="6" name="renewDayOfWeek"></label>
+          </div>
       </div>
    </div>
    <div class="panel-footer">

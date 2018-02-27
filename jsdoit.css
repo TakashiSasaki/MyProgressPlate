@@ -7,7 +7,7 @@
     background-position: center
 }
 
-div.menu {
+#divMenu {
     padding: 0em;
     margin: 0em;
     left: 0em;
@@ -24,6 +24,7 @@ h1 {
 
 h2 {
     font-size:1em;
+    background-color: pink;
 }
 
 label{

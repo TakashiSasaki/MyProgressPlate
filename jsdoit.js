@@ -18,7 +18,7 @@ var mouseDownX;
 var mouseDownY;
 var mouseDownElement;
 
-var divStrips, divMenu, inputStripTitle, inputUrl, divRenewAfter, divRenewEveryHours, divRenewDayOfWeek;
+var divStrips, divMenu, inputStripTitle, inputUrl, divRenewAfter, divRenewEveryHours, divRenewDayOfWeek, divLastOpened, divDueDateTime;
 var jsonStrips = {};
 var stripDivs = {};
 
@@ -33,8 +33,23 @@ var jsonStripTemplate = {
     renewAfter: [],
     renewEveryHours:[],
     renewDayOfWeek:[],
-    dueTime: null
+    dueDateTime: 0,
+    lastOpened: 0
 };
+
+function toggleNextSibling(event){
+    var nextSibling = event.target.nextSibling;
+    if(!(nextSibling instanceof HTMLElement)) {
+        nextSibling = nextSibling.nextSibling;
+    }
+    if(nextSibling instanceof HTMLElement){
+        if(nextSibling.style.display === "none") {
+            nextSibling.style.display = "block";
+        } else { 
+            nextSibling.style.display = "none";
+        }
+    }
+}
 
 function loadStrips(){
     jsonStrips = {};
@@ -125,6 +140,8 @@ setTimeout(function(){
     divRenewAfter = document.getElementById("divRenewAfter");
     divRenewEveryHours = document.getElementById("divRenewEveryHours");
     divRenewDayOfWeek = document.getElementById("divRenewDayOfWeek");
+    divDueDateTime = document.getElementById("divDueDateTime");
+    divLastOpened = document.getElementById("divLastOpened");
     loadStrips(i);
     for(var i in stripDivs) {
         if(stripDivs[i] instanceof HTMLElement) {
@@ -242,14 +259,16 @@ function buildDivStrip(stripJson){
 
 function openUrl(event){
     setTimeout(function(){
-        if(divMenu.style.display !== "none") return;
+        if(divMenu.style.display === "block") return;
         var stripId = event.target.dataset.stripId;
         var strip = jsonStrips[stripId];
         var url = strip.url;
         if(typeof url === "string"){
-            window.open(url, "_blank" );
+            window.open(url, "window" + stripId);
+            strip.lastOpened = (new Date()).getTime();
+            window.localStorage.setItem(stripId, JSON.stringify(strip));
         }
-    }, 500);
+    }, 600);
 }
 
 function showMenu(event){
@@ -259,6 +278,8 @@ function showMenu(event){
     divMenu.style.display = "block";
     inputStripTitle.value = strip.stripTitle;
     inputUrl.value = strip.url;
+    divLastOpened.innerHTML = new Date(strip.lastOpened);
+    divDueDateTime.innerHTML = new Date(strip.dueDateTime);
 
     if(!(strip.renewAfter instanceof Array)) strip.renewAfter = [];
     const renewAfter = document.getElementsByName("renewAfter");
