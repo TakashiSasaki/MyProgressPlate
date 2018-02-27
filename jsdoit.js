@@ -18,9 +18,7 @@ var mouseDownX;
 var mouseDownY;
 var mouseDownElement;
 
-var divStrips;
-var divMenu;
-var inputTitle;
+var divStrips, divMenu, inputStripTitle, inputUrl, divRenewAfter, divRenewEveryHours, divRenewDayOfWeek;
 var jsonStrips = {};
 var stripDivs = {};
 
@@ -31,7 +29,10 @@ var jsonStripTemplate = {
     stripTitle: "no title",
     archived: false,
     dirty: true,
-    sticky: false
+    sticky: false,
+    renewAfter: [86400],
+    renewEveryHours:[],
+    renewDayOfWeek:[]
 };
 
 function loadStrips(){
@@ -52,23 +53,62 @@ function loadStrips(){
             stripDivs[jsonStrip.stripId] = divStrip;
         }
     }
-    if(Object.keys(divStrips).length === 0) {
+    if(Object.keys(stripDivs).length === 0) {
         createNewStrip();
     }
 }
 
-function updateStrip(stripId){
-    jsonStrips[stripId].dirty = true;
-    const jsonString = JSON.stringify(jsonStrips[stripId]);
+function updateStrip(event){
+    divMenu.style.display='none';
+    const stripId = event.target.dataset.stripId;
+    var strip = jsonStrips[stripId];
+    strip.dirty = true;
+    strip.stripTitle = inputStripTitle.value;
+    strip.url = inputUrl.value;
+    
+    strip.renewAfter = [];
+    const renewAfter = document.getElementsByName("renewAfter");
+    for(var i=0; i<renewAfter.length; ++i){
+        if(renewAfter[i].checked) {
+            strip.renewAfter.push(renewAfter[i].value);
+        }
+    }
+    
+    strip.renewEveryHours = [];
+    const renewEveryHours = document.getElementsByName("renewEveryHours");
+    for(var i=0; i<renewEveryHours.length; ++i){
+        if(renewEveryHours[i].checked){
+            strip.renewEveryHours.push(renewEveryHours[i].value);
+        }
+    }
+    
+    strip.renewDayOfWeek = [];
+    const renewDayOfWeek = document.getElementsByName("renewDayOfWeek");
+    for(var i=0; i<renewDayOfWeek.length; ++i){
+        if(renewDayOfWeek[i].checked){
+            strip.renewDayOfWeek.push(renewDayOfWeek[i].value);
+        }
+    }
+    
+    const jsonString = JSON.stringify(strip);
     window.localStorage.setItem(stripId, jsonString);
     const oldStripDiv = stripDivs[stripId];
     if(oldStripDiv instanceof HTMLElement) {
         oldStripDiv.remove();
     }
-    const newStripDiv = buildDivStrip(jsonStrips[stripId]);
+    const newStripDiv = buildDivStrip(strip);
     stripDivs[stripId] = newStripDiv;
     sortStripDivs();
 }
+
+function updateTitle(event){
+    var stripId = event.target.dataset.stripId;
+    jsonStrips[stripId].stripTitle = event.target.value;
+    divMenu.style.display = "none";
+    updateStrip(stripId);
+}
+
+
 
 function sortStripDivs(){
     for(var i in stripDivs){
@@ -79,7 +119,11 @@ function sortStripDivs(){
 setTimeout(function(){
     divStrips = document.getElementById("divStrips");
     divMenu = document.getElementById("divMenu");
-    inputTitle = document.getElementById("inputTitle");
+    inputStripTitle = document.getElementById("inputStripTitle");
+    inputUrl = document.getElementById("inputUrl");
+    divRenewAfter = document.getElementById("divRenewAfter");
+    divRenewEveryHours = document.getElementById("divRenewEveryHours");
+    divRenewDayOfWeek = document.getElementById("divRenewDayOfWeek");
     loadStrips(i);
     for(var i in stripDivs) {
         if(stripDivs[i] instanceof HTMLElement) {
@@ -159,7 +203,6 @@ function insertNewStrip(event){
 
 function buildDivStrip(stripJson){
     if(!(stripJson instanceof Object)) {
-        alert(stripJson);
         throw "buildDivStrip: stripJson is not an object";
     }
     var newDivStrip = document.createElement("div");
@@ -195,20 +238,45 @@ function buildDivStrip(stripJson){
     return newDivStrip;
 }
 
-function updateTitle(event){
-    var stripId = event.target.dataset.stripId;
-    jsonStrips[stripId].stripTitle = event.target.value;
-    divMenu.style.display = "none";
-    updateStrip(stripId);
-}
-
 function showMenu(event){
-    var stripId = event.target.dataset.stripId;
-    var jsonStrip = jsonStrips[stripId];
+    const stripId = event.target.dataset.stripId;
+    var strip = jsonStrips[stripId];
     divMenu.style.display = "block";
     divMenu.style.top = "5em";
     divMenu.style.left = "10%";
-    inputTitle.value = jsonStrip.stripTitle;
+    inputStripTitle.value = strip.stripTitle;
+    inputUrl.value = strip.url;
+
+    if(!(strip.renewAfter instanceof Array)) strip.renewAfter = [];
+    const renewAfter = document.getElementsByName("renewAfter");
+    for(var i=0; i<renewAfter.length; ++i){
+        if(strip.renewAfter.indexOf(renewAfter[i].value)>=0){
+            renewAfter[i].checked=true;
+        } else{
+            renewAfter[i].checked=false;
+        }
+    }
+    
+    if(!(strip.renewEveryHours instanceof Array)) strip.renewEveryHours = [];
+    const renewEveryHours = document.getElementsByName("renewEveryHours");
+    for(var j=0; j<renewEveryHours.length; ++j){
+        if(strip.renewEveryHours.indexOf(renewEveryHours[j].value)>=0){
+            renewEveryHours[j].checked=true;
+        } else {
+            renewEveryHours[j].checked=false;            
+        }
+    }
+    
+    if(!(strip.renewDayOfWeek instanceof Array)) strip.renewDayOfWeek = [];
+    const renewDayOfWeek = document.getElementsByName("renewDayOfWeek");
+    for(var k=0; k<divRenewDayOfWeek.children.length; ++k){
+        if(strip.renewDayOfWeek.indexOf(renewDayOfWeek[k].value)>=0){
+            renewDayOfWeek[k].checked=true;
+        } else {
+            renewDayOfWeek[k].checked=false;
+        }
+    }
+    
     setStripId(divMenu, event.target.dataset.stripId);
 }
 
