@@ -34,9 +34,6 @@ var jsonStripTemplate = {
     sticky: false
 };
 
-function updateTitle(){
-}
-
 function loadStrips(){
     jsonStrips = {};
     stripDivs = {};
@@ -198,33 +195,11 @@ function buildDivStrip(stripJson){
     return newDivStrip;
 }
 
-function getChildWithClass(parentElement, className) {
-    for(var i in parentElement.children){
-        if(parentElement.children[i].classList.contains(className)) {
-            return parentElement.children[i];
-        }
-    }
-}
-
-function toggleReadOnly(event){
-    event.target.readOnly = !(event.target.readOnly);
-    event.target.focus();
-    event.target.select();
-}
-
 function updateTitle(event){
     var stripId = event.target.dataset.stripId;
     jsonStrips[stripId].stripTitle = event.target.value;
     divMenu.style.display = "none";
     updateStrip(stripId);
-}
-
-function toggleMenu(event){
-    if(divMenu.style.display !== "block") {
-        showMenu(event);
-    } else {
-        divMenu.style.display = "none";
-    }
 }
 
 function showMenu(event){
