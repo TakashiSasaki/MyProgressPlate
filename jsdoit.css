@@ -2,3 +2,11 @@ img.imgIcon {
     width: 20px;
     height: 20px;
 }
+
+div.menu {
+    padding: 1em;
+    display:none;
+    z-index: 1;
+    position: fixed;
+    max-width: 70%;
+}

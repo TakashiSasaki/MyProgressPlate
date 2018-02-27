@@ -19,6 +19,7 @@ var mouseDownY;
 var mouseDownElement;
 
 var divStrips;
+var divMenu;
 
 setTimeout(function(){
     divStrips = document.getElementById("divStrips");
@@ -26,6 +27,7 @@ setTimeout(function(){
         var newStripDiv = buildStripDiv();
         divStrips.appendChild(newStripDiv);
     }
+    divMenu = document.getElementById("menu");
 }, 100);
 
 
@@ -89,13 +91,17 @@ function getStripJson(stripId){
 }
 
 function insertNewStripDiv(event){
-    var stripDiv = buildStripDiv();
-    event.target.parentNode.parentNode.insertBefore(stripDiv, event.target.parentNode);
+    var newStripDiv = buildStripDiv();
+    var stripDiv = getStripDiv(event.target.dataset.stripId);
+    divStrips.insertBefore(newStripDiv, stripDiv);
+    toggleMenu();
 }
 
 function deleteStripDiv(event){
+    if(divStrips.children.length === 1) return;
     var jsonString = window.localStorage.getItem(event.target.dataset.stripId);
     event.target.remove();
+    toggleMenu();
 }
 
 function buildStripDiv(stripJson){
@@ -133,14 +139,23 @@ function buildStripDiv(stripJson){
     
     
     var buttonAddStrip = document.createElement("button");
-    buttonAddStrip.innerHTML = "+";
+    buttonAddStrip.innerHTML = "&#128397;";
     buttonAddStrip.classList.add("btn");
     buttonAddStrip.classList.add("btn-default");
-    buttonAddStrip.addEventListener("click", insertNewStripDiv);
+    buttonAddStrip.addEventListener("click", toggleMenu);
     buttonAddStrip.dataset.stripId = stripJson.stripId;
     newDivStrip.appendChild(buttonAddStrip);
     
     return newDivStrip;
+}
+
+function getStripDiv(stripId){
+    for(var i=0; i<divStrips.children.length; ++i) {
+        var stripDiv = divStrips.children[i];
+        if(stripDiv.dataset.stripId === stripId) {
+            return stripDiv;
+        }
+    }
 }
 
 function getChildWithClass(parentElement, className) {
@@ -165,4 +180,24 @@ function saveStripTitle(event){
     stripJson.stripTitle = event.target.value;
     stripJson.dirty = true;
     window.localStorage.setItem(event.target.dataset.stripId, JSON.stringify(stripJson));
+}
+
+function toggleMenu(event){
+    if(divMenu.style.display !== "block") {
+        divMenu.dataset.stripId = event.target.dataset.stripId;
+        divMenu.style.display = "block";
+        divMenu.style.top = "5em";
+        divMenu.style.left = "10%";
+        for(var i=0; i<divMenu.children.length; ++i) {
+            divMenu.children[i].dataset.stripId = divMenu.dataset.stripId;
+            for(var j=0; j<divMenu.children[i].children.length; ++j){
+                divMenu.children[i].children[j].dataset.stripId = divMenu.dataset.stripId;
+                if(divMenu.children[i].children[j].classList.contains("stripId")){
+                    divMenu.children[i].children[j].innerHTML=divMenu.dataset.stripId;
+                }           
+            }
+        }
+    } else {
+        divMenu.style.display = "none";
+    }
 }
