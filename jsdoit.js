@@ -30,9 +30,10 @@ var jsonStripTemplate = {
     archived: false,
     dirty: true,
     sticky: false,
-    renewAfter: [86400],
+    renewAfter: [],
     renewEveryHours:[],
-    renewDayOfWeek:[]
+    renewDayOfWeek:[],
+    dueTime: null
 };
 
 function loadStrips(){
@@ -212,6 +213,7 @@ function buildDivStrip(stripJson){
     newDivStrip.classList.add("divStrip");
     newDivStrip.classList.add(stripJson.className);
     newDivStrip.addEventListener("dblclick", showMenu);
+    newDivStrip.addEventListener("click", openUrl);
 
     var spanStatus = document.createElement("span");
     spanStatus.classList.add("status");
@@ -238,12 +240,23 @@ function buildDivStrip(stripJson){
     return newDivStrip;
 }
 
+function openUrl(event){
+    setTimeout(function(){
+        if(divMenu.style.display !== "none") return;
+        var stripId = event.target.dataset.stripId;
+        var strip = jsonStrips[stripId];
+        var url = strip.url;
+        if(typeof url === "string"){
+            window.open(url, "_blank" );
+        }
+    }, 500);
+}
+
 function showMenu(event){
+    
     const stripId = event.target.dataset.stripId;
     var strip = jsonStrips[stripId];
     divMenu.style.display = "block";
-    divMenu.style.top = "5em";
-    divMenu.style.left = "10%";
     inputStripTitle.value = strip.stripTitle;
     inputUrl.value = strip.url;
 
@@ -269,7 +282,7 @@ function showMenu(event){
     
     if(!(strip.renewDayOfWeek instanceof Array)) strip.renewDayOfWeek = [];
     const renewDayOfWeek = document.getElementsByName("renewDayOfWeek");
-    for(var k=0; k<divRenewDayOfWeek.children.length; ++k){
+    for(var k=0; k<renewDayOfWeek.length; ++k){
         if(strip.renewDayOfWeek.indexOf(renewDayOfWeek[k].value)>=0){
             renewDayOfWeek[k].checked=true;
         } else {

@@ -2,18 +2,19 @@
 <div id="divMenu" class="menu panel panel-info">
    <div class="panel-heading" onclick="divMenu.style.display='none'">
       <h1 class="stripId panel-title">Edit the strip</h1>
+      <button class="btn btn-default" onclick="insertNewStrip(event)">New</button>
+      <button class="btn btn-default" onclick="archiveStrip(event)">Archive</button>
       <button  onclick="updateStrip(event)" class="btn btn-default">Submit</button>        
       <button  onclick="divMenu.style.display='none'" class="btn btn-default">Cancel</button>        
    </div>
    <div class="panel-body">
       <input placeholder="title" class="form-control" id="inputStripTitle">
       <input placeholder="URL to open" class="form-control"ondblclick="openUrl(event)" id="inputUrl">
-      <h1>Current due time</h1>
-       <div class="form-control" style="display:none"></div>
+      <h2>Current due time</h2>
+       <div class="form-control"></div>
       <div>
-         <h1>Put off</h1>
-          <div class="form-group" id="divPutOff" style="display:none">
-            <button class="btn btn-default" value="600">10min</button>
+         <h2>Put off</h2>
+          <div class="form-group" id="divPutOff">
             <button class="btn btn-default" value="1800">30min</button>
             <button class="btn btn-default" value="3600">1h</button>
             <button class="btn btn-default" value="7200">2h</button>
@@ -28,9 +29,7 @@
             <button class="btn btn-default" value="1814400">3w</button>
             <button class="btn btn-default" value="2419200">4w</button>
          </div>
-          <h1>Renew after</h1>
-          <div class="form-group" id="divRenewAfter">
-            <label>10min<input type="radio" class="form-control" value="600" name="renewAfter"></label>
+          <h2>Renew after</h2>
             <label>30min<input type="radio" class="form-control" value="1800" name="renewAfter"></label>
             <label>1h<input type="radio" class="form-control" value="3600" name="renewAfter"></label>
             <label>2h<input type="radio" class="form-control" value="7200" name="renewAfter"></label>
@@ -44,37 +43,15 @@
             <label>2w<input type="radio" class="form-control" value="1209600" name="renewAfter"></label>
             <label>3w<input type="radio" class="form-control" value="1814400" name="renewAfter"></label>
             <label>4w<input type="radio" class="form-control" value="2419200" name="renewAfter"></label>
-            <label>5w<input type="radio" class="form-control" value="3024000" name="renewAfter"></label>
-            <label>6w<input type="radio" class="form-control" value="3628800" name="renewAfter"></label>
-          </div>
-         <h1>Renew every</h1>
-         <div class="form-group" id="divRenewEveryHours">
+         <h2>Renew every</h2>
             <label>0am<input type="checkbox" class="form-control" value="86400" name="renewEveryHours"></label>
-            <label>1am<input type="checkbox" class="form-control" value="3600" name="renewEveryHours"></label>
-            <label>2am<input type="checkbox" class="form-control" value="7200" name="renewEveryHours"></label>
             <label>3am<input type="checkbox" class="form-control" value="10800" name="renewEveryHours"></label>
-            <label>4am<input type="checkbox" class="form-control" value="14400" name="renewEveryHours"></label>
-            <label>5am<input type="checkbox" class="form-control" value="18000" name="renewEveryHours"></label>
             <label>6am<input type="checkbox" class="form-control" value="21600" name="renewEveryHours"></label>          
-            <label>7am<input type="checkbox" class="form-control" value="25200" name="renewEveryHours"></label>          
-            <label>8am<input type="checkbox" class="form-control" value="28800" name="renewEveryHours"></label>          
             <label>9am<input type="checkbox" class="form-control" value="32400" name="renewEveryHours"></label>          
-            <label>10am<input type="checkbox" class="form-control" value="36000" name="renewEveryHours"></label>          
-            <label>11am<input type="checkbox" class="form-control" value="39600" name="renewEveryHours"></label>          
             <label>12pm<input type="checkbox" class="form-control" value="43200" name="renewEveryHours"></label>          
-            <label>1pm<input type="checkbox" class="form-control" value="46800" name="renewEveryHours"></label>          
-            <label>2pm<input type="checkbox" class="form-control" value="50400" name="renewEveryHours"></label>          
             <label>3pm<input type="checkbox" class="form-control" value="54000" name="renewEveryHours"></label>          
-            <label>4pm<input type="checkbox" class="form-control" value="57600" name="renewEveryHours"></label>          
-            <label>5pm<input type="checkbox" class="form-control" value="61200" name="renewEveryHours"></label>          
             <label>6pm<input type="checkbox" class="form-control" value="64800" name="renewEveryHours"></label>          
-            <label>7pm<input type="checkbox" class="form-control" value="68400" name="renewEveryHours"></label>          
-            <label>8pm<input type="checkbox" class="form-control" value="72000" name="renewEveryHours"></label>          
             <label>9pm<input type="checkbox" class="form-control" value="75600" name="renewEveryHours"></label>          
-            <label>10pm<input type="checkbox" class="form-control" value="79200" name="renewEveryHours"></label>          
-            <label>11pm<input type="checkbox" class="form-control" value="82800" name="renewEveryHours"></label>          
-         </div>
-         <div class="form-group" id="divRenewDayOfWeek">
             <label>Sun<input type="checkbox" class="form-control" value="0" name="renewDayOfWeek"></label>
             <label>Mon<input type="checkbox" class="form-control" value="1" name="renewDayOfWeek"></label>
             <label>Tue<input type="checkbox" class="form-control" value="2" name="renewDayOfWeek"></label>
@@ -82,12 +59,11 @@
             <label>Thu<input type="checkbox" class="form-control" value="4" name="renewDayOfWeek"></label>
             <label>Fri<input type="checkbox" class="form-control" value="5" name="renewDayOfWeek"></label>
             <label>Sat<input type="checkbox" class="form-control" value="6" name="renewDayOfWeek"></label>
-         </div>
       </div>
    </div>
    <div class="panel-footer">
-      <button class="btn btn-default" onclick="insertNewStrip(event)">Insert new strip</button>
-      <button class="btn btn-default" onclick="archiveStrip(event)">Archive this strip</button>
+      <button class="btn btn-default" onclick="insertNewStrip(event)">New</button>
+      <button class="btn btn-default" onclick="archiveStrip(event)">Archive</button>
       <button  onclick="updateStrip(event)" class="btn btn-default">Submit</button>        
       <button  onclick="divMenu.style.display='none'" class="btn btn-default">Cancel</button>        
    </div>
