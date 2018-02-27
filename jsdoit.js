@@ -25,10 +25,10 @@ var stripDivs = {};
 
 var jsonStripTemplate = {
     stripId: null,
-    dirty: false,
     imgIcon: null,
     className: null,
     stripTitle: "no title",
+    archived: false,
     dirty: true
 };
 
@@ -45,10 +45,12 @@ function loadStrips(){
             throw "loadStrips: jsonStrip is not an object.";
         }
         jsonStrips[jsonStrip.stripId] = jsonStrip;
-        const divStrip = buildDivStrip(jsonStrip);
-        stripDivs[jsonStrip.stripId] = divStrip;
+        if(jsonStrip.archived !== true) {
+            const divStrip = buildDivStrip(jsonStrip);
+            stripDivs[jsonStrip.stripId] = divStrip;
+        }
     }
-    if(Object.keys(jsonStrips).length === 0) {
+    if(Object.keys(divStrips).length === 0) {
         createNewStrip();
     }
 }
@@ -102,6 +104,13 @@ function touchend(element,touchEvent){
     console.log("touchend:" + touchEndElement);
 }
 
+function archiveStrip(event){
+    jsonStrips[event.target.dataset.stripId].archived = true;
+    stripDivs[event.target.dataset.stripId].remove();
+    delete stripDivs[event.target.dataset.stripId];
+    window.localStorage.setItem(event.target.dataset.stripId, JSON.stringify(jsonStrips[event.target.dataset.stripId]));
+    toggleMenu();
+}
 
 function createNewStrip(){
     const stripIds = Object.keys(jsonStrips);
@@ -120,15 +129,9 @@ function createNewStrip(){
     return newStripId;
 }
 
-function addNewStrip(event){
+function insertNewStrip(event){
     var newStripId = createNewStrip();
     divStrips.insertBefore(stripDivs[newStripId], stripDivs[event.target.dataset.stripId]);
-}
-
-function archiveDivStrip(event){
-    var jsonString = window.localStorage.getItem(event.target.dataset.stripId);
-    if(typeof jsonString !== "string") return;
-    event.target.remove();
     toggleMenu();
 }
 
@@ -175,7 +178,7 @@ function buildDivStrip(stripJson){
     buttonAddStrip.addEventListener("click", toggleMenu);
     newDivStrip.appendChild(buttonAddStrip);
     
-    setStripId(newDivStrip, stripJson.stripId)
+    setStripId(newDivStrip, stripJson.stripId);
     
     return newDivStrip;
 }
