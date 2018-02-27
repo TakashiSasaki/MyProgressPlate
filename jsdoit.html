@@ -1,24 +1,90 @@
-<div id="divTest">
-    
-</div>
-<div id="divStrips">
-</div>
-
-<div id="menu" class="menu panel panel-info">
-    <div class="panel-heading">
-        <h1 class="stripId panel-title"></h1>
-    </div>
-    <div class="panel-body">
-        <button class="btn btn-default" onclick="insertNewStrip(event)">
-           Insert new strip
-        </button>
-        <button class="btn btn-default" onclick="archiveStrip(event)">
-            Archive the strip
-        </button>
-    </div>
-    <div class="panel-footer">
-        <button  onclick="toggleMenu(event)" class="btn btn-default">
-            CLOSE
-        </button>        
-    </div>
+<div id="divTest"></div>
+<div id="divStrips"></div>
+<div id="divMenu" class="menu panel panel-info">
+   <div class="panel-heading" onclick="divMenu.style.display='none'">
+      <h1 class="stripId panel-title">Edit the strip</h1>
+   </div>
+   <div class="panel-body">
+      <input placeholder="title" class="form-control" onchange="updateTitle(event)" id="inputTitle">
+      <input placeholder="URL to open" class="form-control" onchange="updateUrl(event)" ondblclick="openUrl(event)">
+      <h1>Current due time</h1>
+       <div class="form-control">
+           
+       </div>
+      <div>
+         <h1>Put off</h1>
+         <div class="form-group">
+            <button value="600">10min</button>
+            <button value="1800">30min</button>
+            <button>1h</button>
+            <button>2h</button>
+            <button>3h</button>
+            <button>6h</button>
+            <button>12h</button>
+            <button>1d</button>
+         </div>
+          <h1>Renew after</h1>
+            <label>10min<input type="checkbox" class="form-control"></label>
+            <label>30min<input type="checkbox" class="form-control"></label>
+            <label>1h<input type="checkbox" class="form-control"></label>
+            <label>2h<input type="checkbox" class="form-control"></label>
+            <label>3h<input type="checkbox" class="form-control"></label>
+            <label>6h<input type="checkbox" class="form-control"></label>
+            <label>12h<input type="checkbox" class="form-control"></label>
+            <label>1d<input type="checkbox" class="form-control"></label>
+            <label>2d<input type="checkbox" class="form-control"></label>
+            <label>3d<input type="checkbox" class="form-control"></label>
+            <label>1w<input type="checkbox" class="form-control"></label>
+            <label>2w<input type="checkbox" class="form-control"></label>
+            <label>3w<input type="checkbox" class="form-control"></label>
+            <label>4w<input type="checkbox" class="form-control"></label>
+            <label>5w<input type="checkbox" class="form-control"></label>
+            <label>6w<input type="checkbox" class="form-control"></label>
+         <h1>Renew every</h1>
+         <div class="form-group">
+            <label>0am<input type="checkbox" class="form-control"></label>
+            <label>1am<input type="checkbox" class="form-control"></label>
+            <label>2am<input type="checkbox" class="form-control"></label>
+            <label>3am<input type="checkbox" class="form-control"></label>
+            <label>4am<input type="checkbox" class="form-control"></label>
+            <label>5am<input type="checkbox" class="form-control"></label>
+            <label>6am<input type="checkbox" class="form-control"></label>          
+            <label>7am<input type="checkbox" class="form-control"></label>          
+            <label>8am<input type="checkbox" class="form-control"></label>          
+            <label>9am<input type="checkbox" class="form-control"></label>          
+            <label>10am<input type="checkbox" class="form-control"></label>          
+            <label>11am<input type="checkbox" class="form-control"></label>          
+            <label>12pm<input type="checkbox" class="form-control"></label>          
+            <label>1pm<input type="checkbox" class="form-control"></label>          
+            <label>2pm<input type="checkbox" class="form-control"></label>          
+            <label>3pm<input type="checkbox" class="form-control"></label>          
+            <label>4pm<input type="checkbox" class="form-control"></label>          
+            <label>5pm<input type="checkbox" class="form-control"></label>          
+            <label>6pm<input type="checkbox" class="form-control"></label>          
+            <label>7pm<input type="checkbox" class="form-control"></label>          
+            <label>8pm<input type="checkbox" class="form-control"></label>          
+            <label>9pm<input type="checkbox" class="form-control"></label>          
+            <label>10pm<input type="checkbox" class="form-control"></label>          
+            <label>11pm<input type="checkbox" class="form-control"></label>          
+            <label>Sun<input type="checkbox" class="form-control"></label>
+            <label>Mon<input type="checkbox" class="form-control"></label>
+            <label>Tue<input type="checkbox" class="form-control"></label>
+            <label>Wed<input type="checkbox" class="form-control"></label>
+            <label>Thu<input type="checkbox" class="form-control"></label>
+            <label>Fri<input type="checkbox" class="form-control"></label>
+            <label>Sat<input type="checkbox" class="form-control"></label>
+         </div>
+      </div>
+   </div>
+   <div class="panel-footer">
+      <button class="btn btn-default" onclick="insertNewStrip(event)">
+      Insert new strip
+      </button>
+      <button class="btn btn-default" onclick="archiveStrip(event)">
+      Archive this strip
+      </button>
+      <button  onclick="toggleMenu(event)" class="btn btn-default">
+      Close
+      </button>        
+   </div>
 </div>

@@ -9,8 +9,17 @@
 
 div.menu {
     padding: 1em;
-    display:none;
+    display:block
     z-index: 1;
     position: fixed;
-    max-width: 70%;
+    min-width: 30em;
+    max-width: 90%;
+}
+
+h1 {
+    font-size:1.1em;
+}
+
+label{
+    width: 3em;
 }

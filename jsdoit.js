@@ -20,6 +20,7 @@ var mouseDownElement;
 
 var divStrips;
 var divMenu;
+var inputTitle;
 var jsonStrips = {};
 var stripDivs = {};
 
@@ -29,8 +30,12 @@ var jsonStripTemplate = {
     className: null,
     stripTitle: "no title",
     archived: false,
-    dirty: true
+    dirty: true,
+    sticky: false
 };
+
+function updateTitle(){
+}
 
 function loadStrips(){
     jsonStrips = {};
@@ -55,9 +60,29 @@ function loadStrips(){
     }
 }
 
+function updateStrip(stripId){
+    jsonStrips[stripId].dirty = true;
+    const jsonString = JSON.stringify(jsonStrips[stripId]);
+    window.localStorage.setItem(stripId, jsonString);
+    const oldStripDiv = stripDivs[stripId];
+    if(oldStripDiv instanceof HTMLElement) {
+        oldStripDiv.remove();
+    }
+    const newStripDiv = buildDivStrip(jsonStrips[stripId]);
+    stripDivs[stripId] = newStripDiv;
+    sortStripDivs();
+}
+
+function sortStripDivs(){
+    for(var i in stripDivs){
+        divStrips.appendChild(stripDivs[i]);
+    }
+}
+
 setTimeout(function(){
     divStrips = document.getElementById("divStrips");
-    divMenu = document.getElementById("menu");
+    divMenu = document.getElementById("divMenu");
+    inputTitle = document.getElementById("inputTitle");
     loadStrips(i);
     for(var i in stripDivs) {
         if(stripDivs[i] instanceof HTMLElement) {
@@ -109,7 +134,7 @@ function archiveStrip(event){
     stripDivs[event.target.dataset.stripId].remove();
     delete stripDivs[event.target.dataset.stripId];
     window.localStorage.setItem(event.target.dataset.stripId, JSON.stringify(jsonStrips[event.target.dataset.stripId]));
-    toggleMenu();
+    divMenu.style.display="none";
 }
 
 function createNewStrip(){
@@ -132,7 +157,7 @@ function createNewStrip(){
 function insertNewStrip(event){
     var newStripId = createNewStrip();
     divStrips.insertBefore(stripDivs[newStripId], stripDivs[event.target.dataset.stripId]);
-    toggleMenu();
+    divMenu.style.display="none";
 }
 
 function buildDivStrip(stripJson){
@@ -146,12 +171,12 @@ function buildDivStrip(stripJson){
     newDivStrip.classList.add("form-group");
     newDivStrip.classList.add("divStrip");
     newDivStrip.classList.add(stripJson.className);
+    newDivStrip.addEventListener("dblclick", showMenu);
 
     var spanStatus = document.createElement("span");
     spanStatus.classList.add("status");
     spanStatus.classList.add("checked");
     spanStatus.classList.add("stripId");
-    spanStatus.addEventListener("dblclick", toggleMenu);
     newDivStrip.appendChild(spanStatus);
     
     if(typeof stripJson.imgIcon === "string") {
@@ -166,18 +191,8 @@ function buildDivStrip(stripJson){
     inputStripTitle.classList.add("btn");
     inputStripTitle.classList.add("btn-default");
     inputStripTitle.readOnly = true;
-    inputStripTitle.addEventListener("dblclick", toggleReadOnly);
-    inputStripTitle.addEventListener("change", saveStripTitle);
     newDivStrip.appendChild(inputStripTitle);
-    
-    
-    var buttonAddStrip = document.createElement("button");
-    buttonAddStrip.innerHTML = "&#128397;";
-    buttonAddStrip.classList.add("btn");
-    buttonAddStrip.classList.add("btn-default");
-    buttonAddStrip.addEventListener("click", toggleMenu);
-    newDivStrip.appendChild(buttonAddStrip);
-    
+        
     setStripId(newDivStrip, stripJson.stripId);
     
     return newDivStrip;
@@ -197,26 +212,29 @@ function toggleReadOnly(event){
     event.target.select();
 }
 
-function saveStripTitle(event){
-    event.target.readOnly = true;
-    var jsonString = window.localStorage.getItem(event.target.dataset.stripId);
-    if(jsonString !== "string") jsonString = "{}";
-    var stripJson = JSON.parse(jsonString);
-    stripJson.stripTitle = event.target.value;
-    stripJson.dirty = true;
-    window.localStorage.setItem(event.target.dataset.stripId, JSON.stringify(stripJson));
+function updateTitle(event){
+    var stripId = event.target.dataset.stripId;
+    jsonStrips[stripId].stripTitle = event.target.value;
+    divMenu.style.display = "none";
+    updateStrip(stripId);
 }
 
 function toggleMenu(event){
     if(divMenu.style.display !== "block") {
-        divMenu.dataset.stripId = event.target.dataset.stripId;
-        divMenu.style.display = "block";
-        divMenu.style.top = "5em";
-        divMenu.style.left = "10%";
-        setStripId(divMenu, event.target.dataset.stripId);
+        showMenu(event);
     } else {
         divMenu.style.display = "none";
     }
+}
+
+function showMenu(event){
+    var stripId = event.target.dataset.stripId;
+    var jsonStrip = jsonStrips[stripId];
+    divMenu.style.display = "block";
+    divMenu.style.top = "5em";
+    divMenu.style.left = "10%";
+    inputTitle.value = jsonStrip.stripTitle;
+    setStripId(divMenu, event.target.dataset.stripId);
 }
 
 
