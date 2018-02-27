@@ -1,6 +1,10 @@
-img.imgIcon {
-    width: 20px;
-    height: 20px;
+.status.checked {
+    padding: 10px;
+    margin: 10px;
+    background:  url('http://icons.iconarchive.com/icons/paomedia/small-n-flat/256/sign-check-icon.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center
 }
 
 div.menu {

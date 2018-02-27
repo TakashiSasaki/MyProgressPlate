@@ -20,16 +20,25 @@ var mouseDownElement;
 
 var divStrips;
 var divMenu;
+var jsonStrips = {};
+var divStrips = {};
 
 setTimeout(function(){
     divStrips = document.getElementById("divStrips");
+    for(var i=0; i<100; ++i){
+        const stringJson = window.localStorage.getItem(i);
+        if(typeof stringJson !== "string") continue;
+        const jsonStrip = JSON.parse(stringJson);
+        const divStrip = buildDivStrip(jsonStrip);
+        divStrips.appendChild(divStrip);
+    }
     if(divStrips.children.length === 0){
-        var newStripDiv = buildStripDiv();
+        var newStripDiv = buildDivStrip();
         divStrips.appendChild(newStripDiv);
     }
     divMenu = document.getElementById("menu");
+    
 }, 100);
-
 
 function dblclick(element,mouseEvent){
     console.log("dblclick:" + element + mouseEvent);
@@ -69,6 +78,12 @@ function touchend(element,touchEvent){
     console.log("touchend:" + touchEndElement);
 }
 
+function loadJsonStrips(stripId){
+}
+
+function saveJsonStrips(){
+}
+
 function getStripJson(stripId){
     if(stripId === undefined) {
         stripId = divStrips.children.length;
@@ -81,8 +96,8 @@ function getStripJson(stripId){
         stripJson = {
             stripId: stripId,
             dirty: false,
+            imgIcon: null,
             className: null,
-            imgIcon: "http://icons.iconarchive.com/icons/paomedia/small-n-flat/256/sign-check-icon.png",
             stripTitle: "no title"
         };
         window.localStorage.setItem(stripId, JSON.stringify(stripJson));
@@ -91,22 +106,22 @@ function getStripJson(stripId){
 }
 
 function insertNewStripDiv(event){
-    var newStripDiv = buildStripDiv();
+    var newStripDiv = buildDivStrip();
     var stripDiv = getStripDiv(event.target.dataset.stripId);
     divStrips.insertBefore(newStripDiv, stripDiv);
     toggleMenu();
 }
 
-function deleteStripDiv(event){
-    if(divStrips.children.length === 1) return;
+function archiveDivStrip(event){
     var jsonString = window.localStorage.getItem(event.target.dataset.stripId);
+    if(typeof jsonString !== "string") return;
     event.target.remove();
     toggleMenu();
 }
 
-function buildStripDiv(stripJson){
+function buildDivStrip(stripJson){
     if(stripJson === undefined) stripJson = getStripJson();
-    if(!(stripJson instanceof Object)) throw "buildStripDiv: stripJson is not an object";
+    if(!(stripJson instanceof Object)) throw "buildDivStrip: stripJson is not an object";
     var newDivStrip = document.createElement("div");
     newDivStrip.classList.add("btn");
     newDivStrip.classList.add("btn-primary");
@@ -115,18 +130,21 @@ function buildStripDiv(stripJson){
     newDivStrip.classList.add(stripJson.className);
     newDivStrip.dataset.stripId = stripJson.stripId;
 
-    var spanStripId = document.createElement("span");
-    spanStripId.innerHTML = stripJson.stripId;
-    spanStripId.classList.add("spanStripId");
-    spanStripId.dataset.stripId = stripJson.stripId;
-    newDivStrip.appendChild(spanStripId);
+    var spanStatus = document.createElement("span");
+    spanStatus.classList.add("status");
+    spanStatus.classList.add("checked");
+    spanStatus.innerHTML= stripJson.stripId;
+    spanStatus.addEventListener("dblclick", toggleMenu);
+    newDivStrip.appendChild(spanStatus);
     
-    var imgIcon = document.createElement("img");
-    imgIcon.src = stripJson.imgIcon;
-    imgIcon.classList.add("imgIcon");
-    imgIcon.dataset.stripId = stripJson.stripId;
-    newDivStrip.appendChild(imgIcon);
-    
+    if(typeof stripJson.imgIcon === "string") {
+        var imgIcon = document.createElement("img");
+        imgIcon.src = stripJson.imgIcon;
+        imgIcon.classList.add("imgIcon");
+        imgIcon.dataset.stripId = stripJson.stripId;
+        newDivStrip.appendChild(imgIcon);
+    }
+        
     var inputStripTitle = document.createElement("input");
     inputStripTitle.value = stripJson.stripTitle;
     inputStripTitle.classList.add("btn");
