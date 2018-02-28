@@ -34,7 +34,8 @@ var jsonStripTemplate = {
     renewEveryHours:[],
     renewDayOfWeek:[],
     dueDateTime: 0,
-    lastOpened: 0
+    lastOpened: 0,
+    keywords: []
 };
 
 function toggleNextSibling(event){
@@ -55,18 +56,25 @@ function loadStrips(){
     jsonStrips = {};
     stripDivs = {};
     for(var i=0; i<window.localStorage.length; ++i) {
-        const stringJson = window.localStorage.getItem(window.localStorage.key(i));
+        const keyString = window.localStorage.key(i);
+        const key = parseInt(keyString);
+        if(isNaN(key)) continue;
+        if(Math.floor(key) !== key) continue;
+        const stringJson = window.localStorage.getItem(key);
         if(typeof stringJson !== "string") {
             throw "loadStrips: stringJson is not a string";
         }
-        const jsonStrip = JSON.parse(stringJson);
-        if(!(jsonStrip instanceof Object)){
-            throw "loadStrips: jsonStrip is not an object.";
+        const strip = JSON.parse(stringJson);
+        if(!(strip instanceof Object)){
+            console.log("loadStrips: i = " + i);
+            console.log("loadStrips: window.localStorage.key(i) = " + window.localStorage.key(i));
+            console.log("loadStrips: stringJson = " + stringJson);
+            throw "loadStrips: strip is not an object.";
         }
-        jsonStrips[jsonStrip.stripId] = jsonStrip;
-        if(jsonStrip.archived !== true) {
-            const divStrip = buildDivStrip(jsonStrip);
-            stripDivs[jsonStrip.stripId] = divStrip;
+        jsonStrips[strip.stripId] = strip;
+        if(strip.archived !== true) {
+            const divStrip = buildDivStrip(strip);
+            stripDivs[strip.stripId] = divStrip;
         }
     }
     if(Object.keys(stripDivs).length === 0) {
@@ -123,8 +131,6 @@ function updateTitle(event){
     divMenu.style.display = "none";
     updateStrip(stripId);
 }
-
-
 
 function sortStripDivs(){
     for(var i in stripDivs){
@@ -224,18 +230,18 @@ function buildDivStrip(stripJson){
         throw "buildDivStrip: stripJson is not an object";
     }
     var newDivStrip = document.createElement("div");
-    newDivStrip.classList.add("btn");
-    newDivStrip.classList.add("btn-primary");
-    newDivStrip.classList.add("form-group");
-    newDivStrip.classList.add("divStrip");
-    newDivStrip.classList.add(stripJson.className);
+    newDivStrip.classList.add("btn", "btn-primary", "form-group", "divStrip", stripJson.className);
+    //newDivStrip.classList.add("btn-primary");
+    //newDivStrip.classList.add("form-group");
+    //newDivStrip.classList.add("divStrip");
+    //newDivStrip.classList.add(stripJson.className);
     newDivStrip.addEventListener("dblclick", showMenu);
     newDivStrip.addEventListener("click", openUrl);
 
     var spanStatus = document.createElement("span");
-    spanStatus.classList.add("status");
-    spanStatus.classList.add("checked");
-    spanStatus.classList.add("stripId");
+    spanStatus.classList.add("status", "checked", "stripId");
+    //spanStatus.classList.add("checked");
+    //spanStatus.classList.add("stripId");
     newDivStrip.appendChild(spanStatus);
     
     if(typeof stripJson.imgIcon === "string") {
@@ -247,8 +253,8 @@ function buildDivStrip(stripJson){
         
     var inputStripTitle = document.createElement("input");
     inputStripTitle.value = stripJson.stripTitle;
-    inputStripTitle.classList.add("btn");
-    inputStripTitle.classList.add("btn-default");
+    inputStripTitle.classList.add("btn", "btn-default");
+    //inputStripTitle.classList.add("btn-default");
     inputStripTitle.readOnly = true;
     newDivStrip.appendChild(inputStripTitle);
         
