@@ -40,20 +40,6 @@ var jsonStripTemplate = {
     keywords: []
 };
 
-function toggleNextSibling(event) {
-    var nextSibling = event.target.nextSibling;
-    if (!(nextSibling instanceof HTMLElement)) {
-        nextSibling = nextSibling.nextSibling;
-    }
-    if (nextSibling instanceof HTMLElement) {
-        if (nextSibling.style.display === "none") {
-            nextSibling.style.display = "block";
-        } else {
-            nextSibling.style.display = "none";
-        }
-    }
-}
-
 function loadStrips() {
     jsonStrips = {};
     stripDivs = {};
@@ -233,17 +219,11 @@ function buildDivStrip(stripJson) {
     }
     var newDivStrip = document.createElement("div");
     newDivStrip.classList.add("btn", "btn-primary", "form-group", "divStrip", stripJson.className);
-    //newDivStrip.classList.add("btn-primary");
-    //newDivStrip.classList.add("form-group");
-    //newDivStrip.classList.add("divStrip");
-    //newDivStrip.classList.add(stripJson.className);
-    newDivStrip.addEventListener("dblclick", showMenu);
-    newDivStrip.addEventListener("click", openUrl);
+    newDivStrip.addEventListener("click", showMenu);
+    newDivStrip.addEventListener("dblclick", openUrl);
 
     var spanStatus = document.createElement("span");
     spanStatus.classList.add("status", "checked", "stripId");
-    //spanStatus.classList.add("checked");
-    //spanStatus.classList.add("stripId");
     newDivStrip.appendChild(spanStatus);
 
     if (typeof stripJson.imgIcon === "string") {
@@ -256,7 +236,6 @@ function buildDivStrip(stripJson) {
     var inputStripTitle = document.createElement("input");
     inputStripTitle.value = stripJson.stripTitle;
     inputStripTitle.classList.add("btn", "btn-default");
-    //inputStripTitle.classList.add("btn-default");
     inputStripTitle.readOnly = true;
     newDivStrip.appendChild(inputStripTitle);
 
