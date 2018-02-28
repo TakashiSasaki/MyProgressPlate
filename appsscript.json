@@ -2,5 +2,9 @@
   "timeZone": "Asia/Tokyo",
   "dependencies": {
   },
+  "webapp": {
+    "access": "ANYONE",
+    "executeAs": "USER_ACCESSING"
+  },
   "exceptionLogging": "STACKDRIVER"
 }
