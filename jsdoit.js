@@ -1,6 +1,5 @@
 //http://jsdo.it/TakashiSasaki/SOuH/edit
 "use strict";
-
 var touchMoveX;
 var touchMoveY;
 var touchMoveElement;
@@ -24,7 +23,11 @@ var divStrips, divMenu, inputStripTitle, inputUrl, divRenewAfter, divRenewEveryH
 var jsonStrips = {};
 var stripDivs = {};
 
-var jsonStripTemplate = {
+var jsonStripTemplate = (function (x) {
+    var newObject = Object.assign(x);
+    Object.preventExtensions(newObject);
+    return newObject;
+})({
     stripId: null,
     imgIcon: null,
     className: null,
@@ -37,8 +40,9 @@ var jsonStripTemplate = {
     renewDayOfWeek: [],
     dueDateTime: 0,
     lastOpened: 0,
-    keywords: []
-};
+    keywords: [],
+    color: null
+});
 
 function loadStrips() {
     jsonStrips = {};
@@ -219,8 +223,8 @@ function buildDivStrip(stripJson) {
     }
     var newDivStrip = document.createElement("div");
     newDivStrip.classList.add("btn", "btn-primary", "form-group", "divStrip", stripJson.className);
-    newDivStrip.addEventListener("click", showMenu);
-    newDivStrip.addEventListener("dblclick", openUrl);
+    newDivStrip.addEventListener("dblclick", showMenu);
+    newDivStrip.addEventListener("click", openUrl);
 
     var spanStatus = document.createElement("span");
     spanStatus.classList.add("status", "checked", "stripId");
@@ -314,5 +318,32 @@ function setStripId(element, stripId) {
             }
         }
     }
+}
+
+function activateTab(event) {
+    var id = event.target.getAttribute("href").substr(1);
+    if (event.target instanceof HTMLLIElement) {
+        var ulElement = event.target;
+    } else if (event.target.parentNode instanceof HTMLLIElement) {
+        var ulElement = event.target.parentNode;
+    } else {
+        throw "activateTab: can't find HTMLLIElement.";
+    }
+
+    var ulElements = ulElement.children;
+    for (var i = 0; i < ulElements.length; ++i) {
+        ulElements[i].classList.remove("active");
+    }
+    ulElement.classList.add("active");
+
+    var divElement = document.getElementById(id);
+    if (!(divElement instanceof HTMLDivElement)) {
+        throw "activateTab: can't find HTMLDivElement of id = " + id;
+    }
+    var divElements = divElement.parentNode.children;
+    for (var j = 0; j < divElements.length; ++j) {
+        divElements[j].classList.remove("active");
+    }
+    divElement.classList.add("active");
 }
 
