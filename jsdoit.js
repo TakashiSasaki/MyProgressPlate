@@ -56,11 +56,13 @@ function updateStrip(event) {
     var stripId = event.target.dataset.stripId;
     var strip = jsonStrips[stripId];
     strip.dirty = true;
-    strip.stripTitle = inputStripTitle.value;
-    strip.url = inputUrl.value;
+    strip.stripTitle = idElements.inputStripTitle.value;
+    strip.url = idElements.inputUrl.value;
     strip.renewAfter = getCheckedValues("renewAfter");
     strip.renewEveryHours = getCheckedValues("renewEveryHours");
     strip.renewDayOfWeek = getCheckedValues("renewDayOfWeek");
+    strip.color = idElements.inputColor.value;
+    console.log("updateStrip: " + strip.color);
 
     var jsonString = JSON.stringify(strip);
     window.localStorage.setItem(stripId, jsonString);
@@ -174,6 +176,10 @@ function showMenu(event) {
     idElements.inputUrl.value = strip.url;
     idElements.divLastOpened.innerHTML = new Date(strip.lastOpened);
     idElements.divDueDateTime.innerHTML = new Date(strip.dueDateTime);
+    idElements.inputColor.value = strip.color;
+    idElements.inputColor.placeholder = strip.color;
+    idElements.inputColor.style.backgroundColor = "#" + strip.color;
+    console.log("showMenu: " + strip.color);
 
     checkByValues("renewAfter", strip.renewAfter);
     checkByValues("renewEveryHours", strip.renewEveryHours);

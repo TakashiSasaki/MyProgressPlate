@@ -30,3 +30,8 @@ h2 {
 label{
     width: 3em;
 }
+
+#inputColor {
+    min-height: 2em;
+    font-size: 4em;
+}
