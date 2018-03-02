@@ -2,7 +2,7 @@
 
 "use strict";
 
-var jsonStrips = {};
+var strips = {};
 var stripDivs = {};
 var idElements = {};
 
@@ -28,8 +28,7 @@ var jsonStripTemplate = (function (x) {
 });
 
 function loadStrips() {
-    jsonStrips = {};
-    stripDivs = {};
+    strips = {};stripDivs = {};
     for (var i = 0; i < window.localStorage.length; ++i) {
         var keyString = window.localStorage.key(i);
         var key = parseInt(keyString);
@@ -39,7 +38,7 @@ function loadStrips() {
         if (typeof stringJson !== "string") throw "loadStrips: stringJson should be a string.";
         var strip = JSON.parse(stringJson);
         if (typeof strip !== "object") throw "loadStrips: strip should be an object.";
-        jsonStrips[strip.stripId] = strip;
+        strips[strip.stripId] = strip;
         if (strip.archived !== true) {
             var divStrip = buildStripDiv(strip);
             stripDivs[strip.stripId] = divStrip;
@@ -53,7 +52,7 @@ function loadStrips() {
 function saveStrip(event) {
     idElements.divMenu.style.display = 'none';
     var stripId = event.target.dataset.stripId;
-    var strip = jsonStrips[stripId];
+    var strip = strips[stripId];
     strip.dirty = true;
     strip.stripTitle = idElements.inputStripTitle.value;
     strip.url = idElements.inputUrl.value;
@@ -93,19 +92,19 @@ setTimeout(function () {
 
 function archiveStrip(event) {
     if (!event instanceof Event) throw "archiveStrip: event should be an Event.";
-    jsonStrips[event.target.dataset.stripId].archived = true;
+    strips[event.target.dataset.stripId].archived = true;
     stripDivs[event.target.dataset.stripId].remove();
     delete stripDivs[event.target.dataset.stripId];
-    window.localStorage.setItem(event.target.dataset.stripId, JSON.stringify(jsonStrips[event.target.dataset.stripId]));
+    window.localStorage.setItem(event.target.dataset.stripId, JSON.stringify(strips[event.target.dataset.stripId]));
     divMenu.style.display = "none";
 }
 
 function createNewStrip() {
-    var stripIds = Object.keys(jsonStrips);
+    var stripIds = Object.keys(strips);
     var newStripId = stripIds.length === 0 ? 0 : Math.max.apply(null, Object.keys(stripIds)) + 1;
     var newJsonStrip = Object.assign({}, jsonStripTemplate);
     newJsonStrip.stripId = newStripId;
-    jsonStrips[newStripId] = newJsonStrip;
+    strips[newStripId] = newJsonStrip;
     var newDivStrip = buildStripDiv(newJsonStrip);
     stripDivs[newStripId] = newDivStrip;
     window.localStorage.setItem(newStripId, JSON.stringify(newJsonStrip));
@@ -156,7 +155,7 @@ function openUrl(event) {
     setTimeout(function () {
         if (idElements.divMenu.style.display === "block") return;
         var stripId = event.target.dataset.stripId;
-        var strip = jsonStrips[stripId];
+        var strip = strips[stripId];
         var url = strip.url;
         if (typeof url === "string") {
             window.open(url, "window" + stripId);
@@ -168,7 +167,7 @@ function openUrl(event) {
 
 function showMenu(event) {
     var stripId = event.target.dataset.stripId;
-    var strip = jsonStrips[stripId];
+    var strip = strips[stripId];
     idElements.divMenu.style.display = "block";
     idElements.inputStripTitle.value = strip.stripTitle;
     idElements.inputUrl.value = strip.url;
