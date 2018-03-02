@@ -84,7 +84,7 @@ setTimeout(function () {
             window.divStrips.appendChild(stripDivs[i]);
         }
     }
-}, 100);
+}, 0);
 
 function archiveStrip(event) {
     if (!event instanceof Event) throw "archiveStrip: event should be an Event.";
@@ -120,9 +120,14 @@ function insertNewStrip(event) {
 function buildStripDiv(stripJson) {
     if (typeof stripJson !== "object") throw "buildStripDiv: stripJson should be an object.";
     var newDivStrip = document.createElement("div");
-    newDivStrip.classList.add("btn", "btn-default", "form-group", "divStrip", stripJson.className);
+    newDivStrip.classList.add("btn", "form-group", "divStrip", stripJson.className);
     newDivStrip.addEventListener("dblclick", showMenu);
     newDivStrip.addEventListener("click", openUrl);
+    if (typeof stripJson.color === "string") {
+        newDivStrip.style.backgroundColor = "#" + stripJson.color;
+    } else {
+        newDivStrip.style.backgroundColor = "lightgray";
+    }
 
     var spanStatus = document.createElement("span");
     spanStatus.classList.add("status", "checked", "stripId");
