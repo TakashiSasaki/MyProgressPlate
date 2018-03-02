@@ -2,7 +2,6 @@
 
 "use strict";
 
-var divStrips, divMenu, inputStripTitle, inputUrl, divRenewAfter, divRenewEveryHours, divRenewDayOfWeek, divLastOpened, divDueDateTime;
 var jsonStrips = {};
 var stripDivs = {};
 var idElements = {};
