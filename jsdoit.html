@@ -31,16 +31,18 @@
         <h1 class="panel-title stripId">Edit strip <span id="spanStripId"></span></h1>
         <button class="btn btn-default" onclick="insertNewStrip(event)">New</button>
         <button class="btn btn-default" onclick="archiveStrip(event)">Archive</button>
-        <button  onclick="saveStrip(event)" class="btn btn-default">Submit</button>        
+        <button  onclick="saveStrip(event);event.stopPropagation()" class="btn btn-default">Submit</button>        
+        <button  onclick="openUrl(event)" class="btn btn-default">Open</button>        
         <span>
         tap to cancel
         </span>
     </div>
     <div class="panel-body" onclick="event.stopPropagation()">
         <ul class="nav nav-tabs">
-            <li onclick="activateTab(event)" class="active"><a href="#divSummary">Summary</a></li>
-            <li onclick="activateTab(event)"><a href="#divEvery">Renew</a></li>
-            <li onclick="activateTab(event)"><a href="#divColor">Color</a></li>
+            <li onclick="activateTab(event);saveStrip(event)" class="active"><a href="#divSummary">Summary</a></li>
+            <li onclick="activateTab(event);saveStrip(event)"><a href="#divEvery">Renew</a></li>
+            <li onclick="activateTab(event);saveStrip(event)"><a href="#divColor">Color</a></li>
+            <li onclick="activateTab(event);saveStrip(event)"><a href="#divStripJson">JSON</a></li>
         </ul>
         <div class="tab-content">
             <div class="tab-pane active" id="divSummary">
@@ -66,7 +68,7 @@
                     <div class="form-group">
                         <label class="control-label col-xs-1">Next</label>
                         <div class="col-xs-11">
-                            <div class="form-control" id="divDueDateTime"></div>
+                            <div class="form-control" id="divDueDateTime" ondblclick="updateDueDateTime(event)"></div>
                         </div>
                     </div>
                 </form>
@@ -89,7 +91,7 @@
             </div>
             <div class="tab-pane" id="divEvery">
                 <h2 onclick="toggleNextSibling(event)">Renew after</h2>
-                <div class="form-group" id="divRenewAfter" onclick="event.stopPropagation()">
+                <div class="form-group" id="divRenewAfter" onclick="event.stopPropagation()" >
                     <label>30min<input type="radio" class="form-control" value="1800" name="renewAfter"></label>
                     <label>1h<input type="radio" class="form-control" value="3600" name="renewAfter"></label>
                     <label>2h<input type="radio" class="form-control" value="7200" name="renewAfter"></label>
@@ -105,22 +107,24 @@
                     <label>4w<input type="radio" class="form-control" value="2419200" name="renewAfter"></label>
                 </div>
                 <h2 onclick="toggleNextSibling(event)">Renew every</h2>
-                <div class="form-group" id="divRenewEvery" onclick="event.stopPropagation()">
-                    <label>0am<input type="checkbox" class="form-control" value="86400" name="renewEveryHours"></label>
-                    <label>3am<input type="checkbox" class="form-control" value="10800" name="renewEveryHours"></label>
-                    <label>6am<input type="checkbox" class="form-control" value="21600" name="renewEveryHours"></label>          
-                    <label>9am<input type="checkbox" class="form-control" value="32400" name="renewEveryHours"></label>          
-                    <label>12pm<input type="checkbox" class="form-control" value="43200" name="renewEveryHours"></label>          
-                    <label>3pm<input type="checkbox" class="form-control" value="54000" name="renewEveryHours"></label>          
-                    <label>6pm<input type="checkbox" class="form-control" value="64800" name="renewEveryHours"></label>          
-                    <label>9pm<input type="checkbox" class="form-control" value="75600" name="renewEveryHours"></label>          
-                    <label>Sun<input type="checkbox" class="form-control" value="0" name="renewDayOfWeek"></label>
-                    <label>Mon<input type="checkbox" class="form-control" value="1" name="renewDayOfWeek"></label>
-                    <label>Tue<input type="checkbox" class="form-control" value="2" name="renewDayOfWeek"></label>
-                    <label>Wed<input type="checkbox" class="form-control" value="3" name="renewDayOfWeek"></label>
-                    <label>Thu<input type="checkbox" class="form-control" value="4" name="renewDayOfWeek"></label>
-                    <label>Fri<input type="checkbox" class="form-control" value="5" name="renewDayOfWeek"></label>
-                    <label>Sat<input type="checkbox" class="form-control" value="6" name="renewDayOfWeek"></label>
+                <div class="form-group" id="divRenewEveryHours" onclick="event.stopPropagation()">
+                    <label>0am<input type="checkbox" class="form-control" value="0" name="renewEveryHours"></label>
+                    <label>3am<input type="checkbox" class="form-control" value="3" name="renewEveryHours"></label>
+                    <label>6am<input type="checkbox" class="form-control" value="6" name="renewEveryHours"></label>          
+                    <label>9am<input type="checkbox" class="form-control" value="9" name="renewEveryHours"></label>          
+                    <label>12pm<input type="checkbox" class="form-control" value="12" name="renewEveryHours"></label>          
+                    <label>3pm<input type="checkbox" class="form-control" value="15" name="renewEveryHours"></label>          
+                    <label>6pm<input type="checkbox" class="form-control" value="18" name="renewEveryHours"></label>          
+                    <label>9pm<input type="checkbox" class="form-control" value="21" name="renewEveryHours"></label>          
+                </div>
+                <div class="form-group" id="divReneweEveryDay" onclick="event.stopPropagation()">
+                    <label>Sun<input type="checkbox" class="form-control" value="0" name="renewEveryDay"></label>
+                    <label>Mon<input type="checkbox" class="form-control" value="1" name="renewEveryDay"></label>
+                    <label>Tue<input type="checkbox" class="form-control" value="2" name="renewEveryDay"></label>
+                    <label>Wed<input type="checkbox" class="form-control" value="3" name="renewEveryDay"></label>
+                    <label>Thu<input type="checkbox" class="form-control" value="4" name="renewEveryDay"></label>
+                    <label>Fri<input type="checkbox" class="form-control" value="5" name="renewEveryDay"></label>
+                    <label>Sat<input type="checkbox" class="form-control" value="6" name="renewEveryDay"></label>
                 </div>
             </div>
             <div class="tab-pane" id="divColor">
@@ -128,6 +132,10 @@
                 </p>
                 <input class="form-control jscolor"value="000000" id="inputColor" 
                     ondblclick="this.value=this.placeholder; this.style.backgroundColor='#'+this.placeholder;">
+            </div>
+            <div class="tab-pane" id="divStripJson">
+                <textarea class="form-control" readonly="1" onfocus="this.click(this)"
+                onclick="this.value=JSON.stringify(strips[this.dataset.stripId],null,2)"></textarea>
             </div>
         </div>
     </div>

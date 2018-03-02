@@ -36,7 +36,7 @@ label{
     font-size: 4em;
 }
 
-#divLocalStorage textarea{
+.tab-pane textarea{
     padding: 0.1em;
     min-height: 30em;
     font-size: 0.7em;

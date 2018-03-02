@@ -52,18 +52,20 @@ function activateTab(event) {
     event.stopPropagation();
     var id = event.target.getAttribute("href").substr(1);
     if (event.target instanceof HTMLLIElement) {
-        var ulElement = event.target;
+        var liActive = event.target;
+        var ul = event.target.parentNode;
     } else if (event.target.parentNode instanceof HTMLLIElement) {
-        var ulElement = event.target.parentNode;
+        var liActive = event.target.parentNode;
+        var ul = event.target.parentNode.parentNode;
     } else {
         throw "activateTab: can't find HTMLLIElement.";
     }
 
-    var ulElements = ulElement.children;
-    for (var i = 0; i < ulElements.length; ++i) {
-        ulElements[i].classList.remove("active");
+    var liElements = ul.children;
+    for (var i = 0; i < liElements.length; ++i) {
+        liElements[i].classList.remove("active");
     }
-    ulElement.classList.add("active");
+    liActive.classList.add("active");
 
     var divElement = document.getElementById(id);
     if (!(divElement instanceof HTMLDivElement)) {

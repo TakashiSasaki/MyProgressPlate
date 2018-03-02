@@ -19,21 +19,88 @@ var jsonStripTemplate = (function (x) {
     sticky: false,
     renewAfter: [],
     renewEveryHours: [],
-    renewDayOfWeek: [],
+    renewEveryDay: [],
     dueDateTime: 0,
     lastOpened: 0,
     keywords: [],
     color: null
 });
 
+function getDay(epoch) {
+    if (getDay.epoch === epoch) return getDay.day;
+    if (typeof epoch !== "number") throw "decomposeDate: expects epoch in millisecond";
+    getDay.epoch = epoch;
+    getDay.day = new Date(epoch).getDay();
+    return getDay.day;
+}
+
+function getHours(epoch) {
+    if (getHours.epoch === epoch) return getHours.hours;
+    if (typeof epoch !== "number") throw "getHours: expects epoch in millisecond";
+    getHours.epoch = epoch;
+    getHours.hours = new Date(epoch).getHours();
+    return getHours.hours;
+}
+
+function setNextHours(epoch, hours) {
+    if (typeof epoch !== "number") throw "setNextHours: epoch should be a number.";
+    if (hours < 0 || hours > 23) throw "setNextHours: hours should be an integer between 0 and 23.";
+    if (setNextHours.epoch === epoch && setNextHours.hours === hours) return setNextHours.nextHoursEpoch;
+    setNextHours.epoch = epoch;setNextHours.hours = hours;
+    if (getHours(epoch) < hours) {
+        var date = new Date(epoch);
+        date.setHours(hours);
+    } else {
+        var date = new Date(epoch + 86400000);
+        date.setHours(hours);
+    }
+    date.setMinutes(0);date.setSeconds(0);date.setMilliseconds(0);
+    setNextHours.nextHoursEpoch = date.getTime();
+    return setNextHours.nextHoursEpoch;
+}
+
+function setNextDay(epoch, day) {
+    if (day < 0 || day > 6) throw "setNextDay: day should be an integer between 0 and 6.";
+    if (setNextDay.epoch === epoch && setNextDay.day === day) return setNextDay.nextDayEpoch;
+    setNextDay.epoch = epoch;setNextDay.day = day;
+    if (getDay(epoch) < day) {
+        var date = new Date(epoch + (day - getDay(epoch)) * 86400000);
+    } else {
+        var date = new Date(epoch + (day - getDay(epoch) + 7) * 86400000);
+    }
+    date.setHours(0), date.setMinutes(0);date.setSeconds(0);date.setMilliseconds(0);
+    setNextDay.nextDayEpoch = date.getTime();
+    return setNextDay.nextDayEpoch;
+}
+
+function updateDueDateTime(event) {
+    var stripId = event.target.dataset.stripId;
+    var strip = strips[stripId];
+    var candidate = strip.lastOpened + 365 * 86400000;
+    strip.renewAfter.forEach(function (x) {
+        candidate = Math.min(candidate, strip.lastOpened + x);
+    });
+    strip.renewEveryHours.forEach(function (x) {
+        candidate = Math.min(candidate, setNextHours(strip.lastOpened, x));
+    });
+    strip.renewEveryDay.forEach(function (x) {
+        console.log(x);candidate = Math.min(candidate, setNextDay(strip.lastOpened, x));
+    });
+    strip.dueDateTime = candidate;
+    window.localStorage.setItem("stripId=" + stripId, JSON.stringify(strip));
+    event.target.innerHTML = new Date(strip.dueDateTime);
+}
+
 function loadStrips() {
     strips = {};stripDivs = {};
     for (var i = 0; i < window.localStorage.length; ++i) {
         var keyString = window.localStorage.key(i);
-        var key = parseInt(keyString);
-        if (isNaN(key)) continue;
-        if (Math.floor(key) !== key) continue;
-        var stringJson = window.localStorage.getItem(key);
+        if (keyString.substr(0, 8) !== "stripId=") continue;
+        //const key = parseInt(keyString);
+        var stripId = parseInt(keyString.substr(8));
+        if (isNaN(stripId)) continue;
+        if (Math.floor(stripId) !== stripId) continue;
+        var stringJson = window.localStorage.getItem(keyString);
         if (typeof stringJson !== "string") throw "loadStrips: stringJson should be a string.";
         var strip = JSON.parse(stringJson);
         if (typeof strip !== "object") throw "loadStrips: strip should be an object.";
@@ -49,19 +116,20 @@ function loadStrips() {
 }
 
 function saveStrip(event) {
-    window.divMenu.style.display = 'none';
     var stripId = event.target.dataset.stripId;
+    if (typeof stripId !== "string") throw "saveStrip: stripId is not a string.";
     var strip = strips[stripId];
+    if (typeof strip !== "object") throw "saveStrip: strips[stripId] is undefined";
     strip.dirty = true;
     strip.stripTitle = window.inputStripTitle.value;
     strip.url = window.inputUrl.value;
     strip.renewAfter = getCheckedValues("renewAfter");
     strip.renewEveryHours = getCheckedValues("renewEveryHours");
-    strip.renewDayOfWeek = getCheckedValues("renewDayOfWeek");
+    strip.renewEveryDay = getCheckedValues("renewEveryDay");
     strip.color = window.inputColor.value;
 
     var jsonString = JSON.stringify(strip);
-    window.localStorage.setItem(stripId, jsonString);
+    window.localStorage.setItem("stripId=" + stripId, jsonString);
     var oldStripDiv = stripDivs[stripId];
     if (oldStripDiv instanceof HTMLElement) {
         oldStripDiv.remove();
@@ -93,7 +161,7 @@ function archiveStrip(event) {
     strip.archived = true;
     stripDivs[stripId].remove();
     delete stripDivs[event.target.dataset.stripId];
-    window.localStorage.setItem(stripId, JSON.stringify(strip));
+    window.localStorage.setItem("stripId=" + stripId, JSON.stringify(strip));
     window.divMenu.style.display = "none";
 }
 
@@ -106,7 +174,7 @@ function createNewStrip() {
     strips[newStripId] = newJsonStrip;
     var newDivStrip = buildStripDiv(newJsonStrip);
     stripDivs[newStripId] = newDivStrip;
-    window.localStorage.setItem(newStripId, JSON.stringify(newJsonStrip));
+    window.localStorage.setItem("stripId=" + newStripId, JSON.stringify(newJsonStrip));
     return newStripId;
 }
 
@@ -120,11 +188,12 @@ function insertNewStrip(event) {
 
 function buildStripDiv(stripJson) {
     if (typeof stripJson !== "object") throw "buildStripDiv: stripJson should be an object.";
+    var stripId = stripJson.stripId;
+    if (typeof stripId !== "number") throw "buildStripDiv: stripId is not a string.";
 
     var newDivStrip = document.createElement("div");
     newDivStrip.classList.add("btn", "form-group", "col-xs-12", "divStrip", stripJson.className);
     newDivStrip.addEventListener("dblclick", showMenu);
-    newDivStrip.addEventListener("click", openUrl);
     if (typeof stripJson.color === "string") {
         newDivStrip.style.backgroundColor = "#" + stripJson.color;
     } else {
@@ -157,22 +226,32 @@ function buildStripDiv(stripJson) {
 }
 
 function openUrl(event) {
+    if (openUrl.status === "waiting") return;
     setTimeout(function () {
-        if (window.divMenu.style.display === "block") return;
         var stripId = event.target.dataset.stripId;
         var strip = strips[stripId];
         var url = strip.url;
         if (typeof url === "string") {
-            window.open(url, "window" + stripId);
-            strip.lastOpened = new Date().getTime();
-            window.localStorage.setItem(stripId, JSON.stringify(strip));
+            var newWindow = window.open(url, "window" + stripId);
+            setTimeout(function () {
+                if (typeof newWindow === "object") {
+                    try {
+                        newWindow.dummy = "dummy";
+                    } catch (e) {
+                        strip.lastOpened = new Date().getTime();
+                        window.localStorage.setItem("stripId=" + stripId, JSON.stringify(strip));
+                    }
+                }
+            }, 5000);
         }
+        openUrl.status === "opened";
     }, 1000);
 }
 
 function showMenu(event) {
     var stripId = event.target.dataset.stripId;
     var strip = strips[stripId];
+    if (typeof strip !== "object") throw "showMenu:  strips[stripId] is not an object. stripId=" + stripId;
     window.divMenu.style.display = "block";
     window.inputStripTitle.value = strip.stripTitle;
     window.inputUrl.value = strip.url;
@@ -184,7 +263,8 @@ function showMenu(event) {
     window.spanStripId.innerHTML = stripId;
     checkByValues("renewAfter", strip.renewAfter);
     checkByValues("renewEveryHours", strip.renewEveryHours);
-    checkByValues("renewDayOfWeek", strip.renewDayOfWeek);
+    if (!strip.renewEveryDay instanceof Array) strip.renewEveryDay = [];
+    checkByValues("renewEveryDay", strip.renewEveryDay);
     traverse("divMenu", function (x) {
         x.dataset.stripId = stripId;
     });
