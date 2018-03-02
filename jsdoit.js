@@ -4,7 +4,6 @@
 
 var strips = {};
 var stripDivs = {};
-var idElements = {};
 
 var jsonStripTemplate = (function (x) {
     var newObject = Object.assign(x);
@@ -50,16 +49,16 @@ function loadStrips() {
 }
 
 function saveStrip(event) {
-    idElements.divMenu.style.display = 'none';
+    window.divMenu.style.display = 'none';
     var stripId = event.target.dataset.stripId;
     var strip = strips[stripId];
     strip.dirty = true;
-    strip.stripTitle = idElements.inputStripTitle.value;
-    strip.url = idElements.inputUrl.value;
+    strip.stripTitle = window.inputStripTitle.value;
+    strip.url = window.inputUrl.value;
     strip.renewAfter = getCheckedValues("renewAfter");
     strip.renewEveryHours = getCheckedValues("renewEveryHours");
     strip.renewDayOfWeek = getCheckedValues("renewDayOfWeek");
-    strip.color = idElements.inputColor.value;
+    strip.color = window.inputColor.value;
 
     var jsonString = JSON.stringify(strip);
     window.localStorage.setItem(stripId, jsonString);
@@ -74,29 +73,28 @@ function saveStrip(event) {
 
 function sortStripDivs() {
     for (var i in stripDivs) {
-        idElements.divStrips.appendChild(stripDivs[i]);
+        window.divStrips.appendChild(stripDivs[i]);
     }
 }
 
 setTimeout(function () {
-    traverse(document, function (x) {
-        if (typeof x.id === "string" && x.id.length > 0) idElements[x.id] = x;
-    });
     loadStrips(i);
     for (var i in stripDivs) {
         if (stripDivs[i] instanceof HTMLElement) {
-            idElements.divStrips.appendChild(stripDivs[i]);
+            window.divStrips.appendChild(stripDivs[i]);
         }
     }
 }, 100);
 
 function archiveStrip(event) {
     if (!event instanceof Event) throw "archiveStrip: event should be an Event.";
-    strips[event.target.dataset.stripId].archived = true;
-    stripDivs[event.target.dataset.stripId].remove();
+    var stripId = event.target.dataset.stripId;
+    var strip = strips[stripId];
+    strip.archived = true;
+    stripDivs[stripId].remove();
     delete stripDivs[event.target.dataset.stripId];
-    window.localStorage.setItem(event.target.dataset.stripId, JSON.stringify(strips[event.target.dataset.stripId]));
-    divMenu.style.display = "none";
+    window.localStorage.setItem(stripId, JSON.stringify(strip));
+    window.divMenu.style.display = "none";
 }
 
 function createNewStrip() {
@@ -115,8 +113,8 @@ function insertNewStrip(event) {
     if (!event instanceof Event) throw "insertNewStrip: event should be an Event.";
     var newStripId = createNewStrip();
     if (typeof newStripId !== "number") throw "insertNewStrip: newStripId should be a number.";
-    idElements.divStrips.insertBefore(stripDivs[newStripId], stripDivs[event.target.dataset.stripId]);
-    idElements.divMenu.style.display = "none";
+    window.divStrips.insertBefore(stripDivs[newStripId], stripDivs[event.target.dataset.stripId]);
+    window.divMenu.style.display = "none";
 }
 
 function buildStripDiv(stripJson) {
@@ -153,7 +151,7 @@ function buildStripDiv(stripJson) {
 
 function openUrl(event) {
     setTimeout(function () {
-        if (idElements.divMenu.style.display === "block") return;
+        if (window.divMenu.style.display === "block") return;
         var stripId = event.target.dataset.stripId;
         var strip = strips[stripId];
         var url = strip.url;
@@ -168,15 +166,15 @@ function openUrl(event) {
 function showMenu(event) {
     var stripId = event.target.dataset.stripId;
     var strip = strips[stripId];
-    idElements.divMenu.style.display = "block";
-    idElements.inputStripTitle.value = strip.stripTitle;
-    idElements.inputUrl.value = strip.url;
-    idElements.divLastOpened.innerHTML = new Date(strip.lastOpened);
-    idElements.divDueDateTime.innerHTML = new Date(strip.dueDateTime);
-    idElements.inputColor.value = strip.color;
-    idElements.inputColor.placeholder = strip.color;
-    idElements.inputColor.style.backgroundColor = "#" + strip.color;
-    idElements.spanStripId.innerHTML = stripId;
+    window.divMenu.style.display = "block";
+    window.inputStripTitle.value = strip.stripTitle;
+    window.inputUrl.value = strip.url;
+    window.divLastOpened.innerHTML = new Date(strip.lastOpened);
+    window.divDueDateTime.innerHTML = new Date(strip.dueDateTime);
+    window.inputColor.value = strip.color;
+    window.inputColor.placeholder = strip.color;
+    window.inputColor.style.backgroundColor = "#" + strip.color;
+    window.spanStripId.innerHTML = stripId;
     checkByValues("renewAfter", strip.renewAfter);
     checkByValues("renewEveryHours", strip.renewEveryHours);
     checkByValues("renewDayOfWeek", strip.renewDayOfWeek);
