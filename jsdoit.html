@@ -1,5 +1,17 @@
-<div id="divStrips"></div>
-<div id="divMenu" class="menu panel panel-info" onclick="this.style.display='none'">
+<div class="panel">
+    <div class="panel-heading">
+        <h1 class="panel-title">MyProgressStrip<span id="spanStrips"></span></h1>
+    </div>
+    <div class="panel-body">
+        <div id="divStrips"></div>    
+    </div>
+    <div class="panel-footer">
+        <button class="btn btn-default">Open spreadsheet</button>
+        <button class="btn btn-default">Upload</button>
+        <button class="btn btn-default">Download</button>
+    </div>
+</div>
+<div id="divMenu" class="menu panel" onclick="this.style.display='none'">
   <div class="panel-heading">
     <h1 class="panel-title stripId">Edit strip <span id="spanStripId"></span></h1>
     <button class="btn btn-default" onclick="insertNewStrip(event)">New</button>
@@ -99,7 +111,7 @@
       <div class="tab-pane" id="divColor">
         <p> double click to reset
         </p>
-        <input class="form-control jscolor"value="ab2567" id="inputColor" 
+        <input class="form-control jscolor"value="000000" id="inputColor" 
           ondblclick="this.value=this.placeholder; this.style.backgroundColor='#'+this.placeholder;">
       </div>
     </div>
