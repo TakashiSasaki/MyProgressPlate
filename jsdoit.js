@@ -120,8 +120,9 @@ function insertNewStrip(event) {
 
 function buildStripDiv(stripJson) {
     if (typeof stripJson !== "object") throw "buildStripDiv: stripJson should be an object.";
+
     var newDivStrip = document.createElement("div");
-    newDivStrip.classList.add("btn", "form-group", "divStrip", stripJson.className);
+    newDivStrip.classList.add("btn", "form-group", "col-xs-12", "divStrip", stripJson.className);
     newDivStrip.addEventListener("dblclick", showMenu);
     newDivStrip.addEventListener("click", openUrl);
     if (typeof stripJson.color === "string") {
@@ -131,7 +132,7 @@ function buildStripDiv(stripJson) {
     }
 
     var spanStatus = document.createElement("span");
-    spanStatus.classList.add("status", "checked", "stripId");
+    spanStatus.classList.add("col-xs-1", "status", "checked", "stripId");
     spanStatus.innerHTML = stripJson.stripId;
     newDivStrip.appendChild(spanStatus);
 
@@ -144,7 +145,7 @@ function buildStripDiv(stripJson) {
 
     var inputStripTitle = document.createElement("input");
     inputStripTitle.value = stripJson.stripTitle;
-    inputStripTitle.classList.add("btn", "btn-default");
+    inputStripTitle.classList.add("btn");
     inputStripTitle.readOnly = true;
     newDivStrip.appendChild(inputStripTitle);
 
