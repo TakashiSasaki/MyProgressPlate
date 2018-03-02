@@ -177,14 +177,12 @@ function showMenu(event) {
     idElements.inputColor.value = strip.color;
     idElements.inputColor.placeholder = strip.color;
     idElements.inputColor.style.backgroundColor = "#" + strip.color;
-    console.log("showMenu: " + strip.color);
-
+    idElements.spanStripId.innerHTML = stripId;
     checkByValues("renewAfter", strip.renewAfter);
     checkByValues("renewEveryHours", strip.renewEveryHours);
     checkByValues("renewDayOfWeek", strip.renewDayOfWeek);
     traverse("divMenu", function (x) {
         x.dataset.stripId = stripId;
     });
-    document.getElementById("spanStripId").innerHTML = stripId;
 }
 
