@@ -1,0 +1,26 @@
+<div id="divRoot">
+    
+<div id="id1">
+    <div id="id1-1"></div>
+</div>
+<div id="id2">
+    <div id="id2-1" name="hello"></div>    
+    <div id="id2-2" name="hello" class="class1"></div>    
+</div>
+<div id="id3" name="hello"></div>
+<div id="id4" name="hello"></div>
+<div id="id5" name="hello"></div>
+</div>
+
+<script>
+    setTimeout(function(){
+        console.log(1);
+        getElements(["id1", "id2", "id5", "id2-2"], "class1").forEach(function(x){x.innerHTML=1;});
+        var hello = getElements("hello");
+        console.log(hello);
+        hello.forEach(function(x){x.innerHTML="good night";});
+        var divRoot = document.getElementById("divRoot");
+        traverse(divRoot, function(x){x.dataset["hello"] = 1});
+    }, 600);
+    
+</script>

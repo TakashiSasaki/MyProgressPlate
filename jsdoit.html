@@ -1,113 +1,145 @@
-<div id="divStrips"></div>
-<div id="divMenu" class="menu panel panel-info" onclick="this.style.display='none'">
-  <div class="panel-heading">
-    <h1 class="panel-title stripId">Edit strip <span id="spanStripId"></span></h1>
-    <button class="btn btn-default" onclick="insertNewStrip(event)">New</button>
-    <button class="btn btn-default" onclick="archiveStrip(event)">Archive</button>
-    <button  onclick="updateStrip(event)" class="btn btn-default">Submit</button>        
-      <span>
-          tap to cancel
-      </span>
-  </div>
-  <div class="panel-body" onclick="event.stopPropagation()">
+<div class="panel">
     <ul class="nav nav-tabs">
-      <li class="active" onclick="activateTab(event)"><a href="#divSummary">Summary</a></li>
-      <li onclick="activateTab(event)"><a href="#divEvery">Renew</a></li>
-        <li onclick="activateTab(event)"><a href="#divColor">Color</a></li>
+        <li class="active" onclick="activateTab(event)"><a href="#divStrips">Strips</a></li>
+        <li class="active" onclick="activateTab(event)"><a href="#divOnline">online</a></li>
+        <li class="active" onclick="activateTab(event)"><a href="#divLocalStorage">localStorage</a></li>
+        <li class="active" onclick="activateTab(event)"><a href="#divLog">log</a></li>
     </ul>
-    <div class="tab-content">
-      <div class="tab-pane active" id="divSummary">
-        <form class="form-horizontal">
-          <div class="form-group">
-            <label class="control-label col-xs-1">Title</label>
-            <div class="col-xs-11">
-              <input placeholder="title" class="form-control" id="inputStripTitle" onclick="event.stopPropagation()">
+    <div class="panel-body">
+        <div class="tab-content">
+            <div class="tab-pane active" id="divStrips"></div>
+            <div class="tab-pane" id="divOnline">
+                <button class="btn btn-default">Open spreadsheet</button>
+                <button class="btn btn-default">Upload</button>
+                <button class="btn btn-default">Download</button>
             </div>
-          </div>
-          <div class="form-group">
-            <label class="control-label col-xs-1">URL</label>
-            <div class="col-xs-11">
-              <input placeholder="URL to open" class="form-control" onclick="event.stopPropagation()" ondblclick="openUrl(event)" id="inputUrl">
+            <div class="tab-pane" id="divLocalStorage">
+                <textarea class="form-control" readonly="1"
+                    onfocus="this.value='';for(var i in localStorage) {if(typeof parseInt(i) === 'number') this.value+=localStorage.getItem(i)+'\n';}">
+                </textarea>
             </div>
-          </div>
-          <div class="form-group">
-            <label class="control-label col-xs-1">Last</label>
-            <div class="col-xs-11">
-              <div class="form-control" id="divLastOpened"></div>
+            <div class="tab-pane" id="divLog">
+                <textarea class="form-control" readonly="1"></textarea>
             </div>
-          </div>
-          <div class="form-group">
-            <label class="control-label col-xs-1">Next</label>
-            <div class="col-xs-11">
-              <div class="form-control" id="divDueDateTime"></div>
-            </div>
-          </div>
-        </form>
-        <h2 onclick="toggleNextSibling(event)">Put off</h2>
-        <div class="form-group" id="divPutOff">
-          <button class="btn btn-default" value="1800">30min</button>
-          <button class="btn btn-default" value="3600">1h</button>
-          <button class="btn btn-default" value="7200">2h</button>
-          <button class="btn btn-default" value="10800">3h</button>
-          <button class="btn btn-default" value="21600">6h</button>
-          <button class="btn btn-default" value="43200">12h</button>
-          <button class="btn btn-default" value="86400">1d</button>
-          <button class="btn btn-default" value="172800">2d</button>
-          <button class="btn btn-default" value="259200">3d</button>
-          <button class="btn btn-default" value="604800">1w</button>
-          <button class="btn btn-default" value="1209600">2w</button>
-          <button class="btn btn-default" value="1814400">3w</button>
-          <button class="btn btn-default" value="2419200">4w</button>
-        </div>
-      </div>
-      <div class="tab-pane" id="divEvery">
-        <h2 onclick="toggleNextSibling(event)">Renew after</h2>
-        <div class="form-group" id="divRenewAfter" onclick="event.stopPropagation()">
-          <label>30min<input type="radio" class="form-control" value="1800" name="renewAfter"></label>
-          <label>1h<input type="radio" class="form-control" value="3600" name="renewAfter"></label>
-          <label>2h<input type="radio" class="form-control" value="7200" name="renewAfter"></label>
-          <label>3h<input type="radio" class="form-control" value="10800" name="renewAfter"></label>
-          <label>6h<input type="radio" class="form-control" value="21600" name="renewAfter"></label>
-          <label>12h<input type="radio" class="form-control" value="43200" name="renewAfter"></label>
-          <label>1d<input type="radio" class="form-control" value="86400" name="renewAfter"></label>
-          <label>2d<input type="radio" class="form-control" value="172800" name="renewAfter"></label>
-          <label>3d<input type="radio" class="form-control" value="259200" name="renewAfter"></label>
-          <label>1w<input type="radio" class="form-control" value="604800" name="renewAfter"></label>
-          <label>2w<input type="radio" class="form-control" value="1209600" name="renewAfter"></label>
-          <label>3w<input type="radio" class="form-control" value="1814400" name="renewAfter"></label>
-          <label>4w<input type="radio" class="form-control" value="2419200" name="renewAfter"></label>
-        </div>
-        <h2 onclick="toggleNextSibling(event)">Renew every</h2>
-        <div class="form-group" id="divRenewEvery" onclick="event.stopPropagation()">
-          <label>0am<input type="checkbox" class="form-control" value="86400" name="renewEveryHours"></label>
-          <label>3am<input type="checkbox" class="form-control" value="10800" name="renewEveryHours"></label>
-          <label>6am<input type="checkbox" class="form-control" value="21600" name="renewEveryHours"></label>          
-          <label>9am<input type="checkbox" class="form-control" value="32400" name="renewEveryHours"></label>          
-          <label>12pm<input type="checkbox" class="form-control" value="43200" name="renewEveryHours"></label>          
-          <label>3pm<input type="checkbox" class="form-control" value="54000" name="renewEveryHours"></label>          
-          <label>6pm<input type="checkbox" class="form-control" value="64800" name="renewEveryHours"></label>          
-          <label>9pm<input type="checkbox" class="form-control" value="75600" name="renewEveryHours"></label>          
-          <label>Sun<input type="checkbox" class="form-control" value="0" name="renewDayOfWeek"></label>
-          <label>Mon<input type="checkbox" class="form-control" value="1" name="renewDayOfWeek"></label>
-          <label>Tue<input type="checkbox" class="form-control" value="2" name="renewDayOfWeek"></label>
-          <label>Wed<input type="checkbox" class="form-control" value="3" name="renewDayOfWeek"></label>
-          <label>Thu<input type="checkbox" class="form-control" value="4" name="renewDayOfWeek"></label>
-          <label>Fri<input type="checkbox" class="form-control" value="5" name="renewDayOfWeek"></label>
-          <label>Sat<input type="checkbox" class="form-control" value="6" name="renewDayOfWeek"></label>
-        </div>
-      </div>
-        <div class="tab-pane" id="divColor">
-            <p> double click to reset
-            </p>
-               <input class="form-control jscolor"value="ab2567" id="inputColor" 
-                ondblclick="this.value=this.placeholder; this.style.backgroundColor='#'+this.placeholder;">
         </div>
     </div>
-  </div>
-  <div class="panel-footer">
-    <button class="btn btn-default" onclick="insertNewStrip(event)">New</button>
-    <button class="btn btn-default" onclick="archiveStrip(event)">Archive</button>
-    <button  onclick="updateStrip(event)" class="btn btn-default">Submit</button>        
-  </div>
+    <div class="panel-footer">
+    </div>
+</div>
+<div id="divMenu" class="menu panel" onclick="this.style.display='none'">
+    <div class="panel-heading">
+        <h1 class="panel-title stripId">Edit strip <span id="spanStripId"></span></h1>
+        <button class="btn btn-default" onclick="insertNewStrip(event)">New</button>
+        <button class="btn btn-default" onclick="archiveStrip(event)">Archive</button>
+        <button  onclick="saveStrip(event);event.stopPropagation()" class="btn btn-default">Submit</button>        
+        <button  onclick="openUrl(event)" class="btn btn-default">Open</button>        
+        <span>
+        tap to cancel
+        </span>
+    </div>
+    <div class="panel-body" onclick="event.stopPropagation()">
+        <ul class="nav nav-tabs">
+            <li onclick="activateTab(event)" class="active"><a href="#divSummary">Summary</a></li>
+            <li onclick="activateTab(event)"><a href="#divEvery">Renew</a></li>
+            <li onclick="activateTab(event)"><a href="#divColor">Color</a></li>
+            <li onclick="activateTab(event)"><a href="#divStripJson">JSON</a></li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane active" id="divSummary">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <label class="control-label col-xs-1">Title</label>
+                        <div class="col-xs-11">
+                            <input placeholder="title" class="form-control" id="inputStripTitle" onclick="event.stopPropagation()">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-xs-1">URL</label>
+                        <div class="col-xs-11">
+                            <input placeholder="URL to open" class="form-control" onclick="event.stopPropagation()" ondblclick="openUrl(event)" id="inputUrl">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-xs-1">Last</label>
+                        <div class="col-xs-11">
+                            <div class="form-control" id="divLastOpened"></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-xs-1">Next</label>
+                        <div class="col-xs-11">
+                            <div class="form-control" id="divDueDateTime" ondblclick="updateDueDateTime(event)"></div>
+                        </div>
+                    </div>
+                </form>
+                <h2 onclick="toggleNextSibling(event)">Put off</h2>
+                <div class="form-group" id="divPutOff">
+                    <button class="btn btn-default" value="1800">30min</button>
+                    <button class="btn btn-default" value="3600">1h</button>
+                    <button class="btn btn-default" value="7200">2h</button>
+                    <button class="btn btn-default" value="10800">3h</button>
+                    <button class="btn btn-default" value="21600">6h</button>
+                    <button class="btn btn-default" value="43200">12h</button>
+                    <button class="btn btn-default" value="86400">1d</button>
+                    <button class="btn btn-default" value="172800">2d</button>
+                    <button class="btn btn-default" value="259200">3d</button>
+                    <button class="btn btn-default" value="604800">1w</button>
+                    <button class="btn btn-default" value="1209600">2w</button>
+                    <button class="btn btn-default" value="1814400">3w</button>
+                    <button class="btn btn-default" value="2419200">4w</button>
+                </div>
+            </div>
+            <div class="tab-pane" id="divEvery">
+                <h2 onclick="toggleNextSibling(event)">Renew after</h2>
+                <div class="form-group" id="divRenewAfter" onclick="event.stopPropagation()">
+                    <label>30min<input type="radio" class="form-control" value="1800" name="renewAfter"></label>
+                    <label>1h<input type="radio" class="form-control" value="3600" name="renewAfter"></label>
+                    <label>2h<input type="radio" class="form-control" value="7200" name="renewAfter"></label>
+                    <label>3h<input type="radio" class="form-control" value="10800" name="renewAfter"></label>
+                    <label>6h<input type="radio" class="form-control" value="21600" name="renewAfter"></label>
+                    <label>12h<input type="radio" class="form-control" value="43200" name="renewAfter"></label>
+                    <label>1d<input type="radio" class="form-control" value="86400" name="renewAfter"></label>
+                    <label>2d<input type="radio" class="form-control" value="172800" name="renewAfter"></label>
+                    <label>3d<input type="radio" class="form-control" value="259200" name="renewAfter"></label>
+                    <label>1w<input type="radio" class="form-control" value="604800" name="renewAfter"></label>
+                    <label>2w<input type="radio" class="form-control" value="1209600" name="renewAfter"></label>
+                    <label>3w<input type="radio" class="form-control" value="1814400" name="renewAfter"></label>
+                    <label>4w<input type="radio" class="form-control" value="2419200" name="renewAfter"></label>
+                </div>
+                <h2 onclick="toggleNextSibling(event)">Renew every</h2>
+                <div class="form-group" id="divRenewEvery" onclick="event.stopPropagation()">
+                    <label>0am<input type="checkbox" class="form-control" value="86400" name="renewEveryHours"></label>
+                    <label>3am<input type="checkbox" class="form-control" value="10800" name="renewEveryHours"></label>
+                    <label>6am<input type="checkbox" class="form-control" value="21600" name="renewEveryHours"></label>          
+                    <label>9am<input type="checkbox" class="form-control" value="32400" name="renewEveryHours"></label>          
+                    <label>12pm<input type="checkbox" class="form-control" value="43200" name="renewEveryHours"></label>          
+                    <label>3pm<input type="checkbox" class="form-control" value="54000" name="renewEveryHours"></label>          
+                    <label>6pm<input type="checkbox" class="form-control" value="64800" name="renewEveryHours"></label>          
+                    <label>9pm<input type="checkbox" class="form-control" value="75600" name="renewEveryHours"></label>          
+                    <label>Sun<input type="checkbox" class="form-control" value="0" name="renewDayOfWeek"></label>
+                    <label>Mon<input type="checkbox" class="form-control" value="1" name="renewDayOfWeek"></label>
+                    <label>Tue<input type="checkbox" class="form-control" value="2" name="renewDayOfWeek"></label>
+                    <label>Wed<input type="checkbox" class="form-control" value="3" name="renewDayOfWeek"></label>
+                    <label>Thu<input type="checkbox" class="form-control" value="4" name="renewDayOfWeek"></label>
+                    <label>Fri<input type="checkbox" class="form-control" value="5" name="renewDayOfWeek"></label>
+                    <label>Sat<input type="checkbox" class="form-control" value="6" name="renewDayOfWeek"></label>
+                </div>
+            </div>
+            <div class="tab-pane" id="divColor">
+                <p> double click to reset
+                </p>
+                <input class="form-control jscolor"value="000000" id="inputColor" 
+                    ondblclick="this.value=this.placeholder; this.style.backgroundColor='#'+this.placeholder;">
+            </div>
+            <div class="tab-pane" id="divStripJson">
+                <textarea class="form-control"></textarea>
+            </div>
+        </div>
+    </div>
+    <div class="panel-footer">
+        <button class="btn btn-default" onclick="insertNewStrip(event)">New</button>
+        <button class="btn btn-default" onclick="archiveStrip(event)">Archive</button>
+        <button  onclick="saveStrip(event)" class="btn btn-default">Submit</button>        
+    </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jscolor/2.0.4/jscolor.js"></script>
