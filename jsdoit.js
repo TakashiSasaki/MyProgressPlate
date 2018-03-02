@@ -84,7 +84,7 @@ setTimeout(function () {
             window.divStrips.appendChild(stripDivs[i]);
         }
     }
-}, 0);
+}, 10);
 
 function archiveStrip(event) {
     if (!event instanceof Event) throw "archiveStrip: event should be an Event.";
@@ -102,6 +102,7 @@ function createNewStrip() {
     var newStripId = stripIds.length === 0 ? 0 : Math.max.apply(null, Object.keys(stripIds)) + 1;
     var newJsonStrip = Object.assign({}, jsonStripTemplate);
     newJsonStrip.stripId = newStripId;
+    newJsonStrip.stripTitle = "no title (" + newStripId + ")";
     strips[newStripId] = newJsonStrip;
     var newDivStrip = buildStripDiv(newJsonStrip);
     stripDivs[newStripId] = newDivStrip;
