@@ -41,7 +41,7 @@ function loadStrips() {
         if (typeof strip !== "object") throw "loadStrips: strip should be an object.";
         jsonStrips[strip.stripId] = strip;
         if (strip.archived !== true) {
-            var divStrip = buildDivStrip(strip);
+            var divStrip = buildStripDiv(strip);
             stripDivs[strip.stripId] = divStrip;
         }
     }
@@ -50,7 +50,7 @@ function loadStrips() {
     }
 }
 
-function updateStrip(event) {
+function saveStrip(event) {
     idElements.divMenu.style.display = 'none';
     var stripId = event.target.dataset.stripId;
     var strip = jsonStrips[stripId];
@@ -61,7 +61,6 @@ function updateStrip(event) {
     strip.renewEveryHours = getCheckedValues("renewEveryHours");
     strip.renewDayOfWeek = getCheckedValues("renewDayOfWeek");
     strip.color = idElements.inputColor.value;
-    console.log("updateStrip: " + strip.color);
 
     var jsonString = JSON.stringify(strip);
     window.localStorage.setItem(stripId, jsonString);
@@ -69,7 +68,7 @@ function updateStrip(event) {
     if (oldStripDiv instanceof HTMLElement) {
         oldStripDiv.remove();
     }
-    var newStripDiv = buildDivStrip(strip);
+    var newStripDiv = buildStripDiv(strip);
     stripDivs[stripId] = newStripDiv;
     sortStripDivs();
 }
@@ -107,7 +106,7 @@ function createNewStrip() {
     var newJsonStrip = Object.assign({}, jsonStripTemplate);
     newJsonStrip.stripId = newStripId;
     jsonStrips[newStripId] = newJsonStrip;
-    var newDivStrip = buildDivStrip(newJsonStrip);
+    var newDivStrip = buildStripDiv(newJsonStrip);
     stripDivs[newStripId] = newDivStrip;
     window.localStorage.setItem(newStripId, JSON.stringify(newJsonStrip));
     return newStripId;
@@ -121,8 +120,8 @@ function insertNewStrip(event) {
     idElements.divMenu.style.display = "none";
 }
 
-function buildDivStrip(stripJson) {
-    if (typeof stripJson !== "object") throw "buildDivStrip: stripJson should be an object.";
+function buildStripDiv(stripJson) {
+    if (typeof stripJson !== "object") throw "buildStripDiv: stripJson should be an object.";
     var newDivStrip = document.createElement("div");
     newDivStrip.classList.add("btn", "btn-default", "form-group", "divStrip", stripJson.className);
     newDivStrip.addEventListener("dblclick", showMenu);
