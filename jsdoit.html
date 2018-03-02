@@ -1,10 +1,15 @@
 <div class="panel">
     <ul class="nav nav-tabs">
-        <li class="active"><a href="#divStrips">Strips</a></li>
+        <li class="active" onclick="activateTab(event)"><a href="#divStrips">Strips</a></li>
+        <li class="active" onclick="activateTab(event)"><a href="#divLocalStorage">localStorage</a></li>
     </ul>
     <div class="panel-body">
         <div class="tab-content">
-            <div class="tab-panel active" id="divStrips">
+            <div class="tab-pane active" id="divStrips"></div>
+            <div class="tab-pane" id="divLocalStorage">
+                <textarea class="form-control"
+                    onfocus="this.value='';for(var i in localStorage) {if(typeof parseInt(i) === 'number') this.value+=localStorage.getItem(i)+'\n';}">
+                </textarea>
             </div>
         </div>
     </div>
