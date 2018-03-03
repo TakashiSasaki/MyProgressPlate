@@ -5,26 +5,24 @@
 var strips = {};
 var stripDivs = {};
 
-var jsonStripTemplate = (function (x) {
-    var newObject = Object.assign(x);
-    Object.preventExtensions(newObject);
-    return newObject;
-})({
-    stripId: null,
-    imgIcon: null,
-    className: null,
-    stripTitle: null,
-    archived: false,
-    dirty: true,
-    sticky: false,
-    renewAfter: [],
-    renewEveryHours: [],
-    renewEveryDay: [],
-    dueDateTime: 0,
-    lastOpened: 0,
-    keywords: [],
-    color: null
-});
+function Strip() {
+    this.stripId = null;
+    this.imgIcon = null;
+    this.className = null;
+    this.stripTitle = null;
+    this.archived = false;
+    this.dirty = true;
+    this.sticky = false;
+    this.renewAfter = [];
+    this.renewEveryHours = [];
+    this.renewEveryDay = [];
+    this.dueDateTime = 0;
+    this.lastOpened = 0;
+    this.keywords = [];
+    this.color = null;
+    Object.preventExtensions(this);
+    return this;
+}
 
 function updateDueDateTime(event) {
     var stripId = event.target.dataset.stripId;
@@ -112,7 +110,7 @@ function archiveStrip(event) {
 function createNewStrip() {
     var stripIds = Object.keys(strips);
     var newStripId = stripIds.length === 0 ? 0 : Math.max.apply(null, Object.keys(stripIds)) + 1;
-    var newJsonStrip = Object.assign({}, jsonStripTemplate);
+    var newJsonStrip = new Strip();
     newJsonStrip.stripId = newStripId;
     newJsonStrip.stripTitle = "no title (" + newStripId + ")";
     strips[newStripId] = newJsonStrip;
