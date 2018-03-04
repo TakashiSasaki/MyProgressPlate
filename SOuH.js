@@ -2,27 +2,162 @@
 
 "use strict";
 
-var strips = {};
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 var stripDivs = {};
 
-function Strip() {
-    this.stripId = null;
-    this.imgIcon = null;
-    this.className = null;
-    this.stripTitle = null;
-    this.archived = false;
-    this.dirty = true;
-    this.sticky = false;
-    this.renewAfter = [];
-    this.renewEveryHours = [];
-    this.renewEveryDay = [];
-    this.dueDateTime = 0;
-    this.lastOpened = 0;
-    this.keywords = [];
-    this.color = null;
+function Strip(stripId, stripTitle) {
+    if (typeof stripId === "number") {
+        this.stripId = stripId;
+        if (typeof stripTitle === "string") {
+            this.stripTitle = stripTitle;
+        } else {
+            this.stripTitle = "strip " + stripId;
+        }
+    } else if (stripId === undefined) {
+        this.stripId = undefined;
+        this.stripTitle = undefined;
+    } else {
+        throw "Strip: expects number or undefined.";
+    }
+    this.imgIcon = undefined;
+    this.className = undefined;
+    this.stripTitle = undefined;
+    this.archived = undefined;
+    this.dirty = undefined;
+    this.sticky = undefined;
+    this.renewAfter = undefined;
+    this.renewEveryHours = undefined;
+    this.renewEveryDay = undefined;
+    this.dueDateTime = undefined;
+    this.lastOpened = undefined;
+    this.keywords = undefined;
+    this.color = undefined;
+    this.url = undefined;
+
+    this.initByJson = function (stringified) {
+        if (typeof stringified !== "string") throw "Strip#initByJson: expects a string.";
+        var parsed = JSON.parse(stringified);
+        try {
+            for (var i in parsed) {
+                this[i] = parsed[i];
+            }
+        } catch (e) {
+            console.log(e);
+            console.log("Strip#initByJson: i = " + i);
+        }
+        return this; // for method chaining
+    }; //initByJson
+
+    Object.defineProperty(this, "initByJson", { enumerable: false });
     Object.preventExtensions(this);
     return this;
 }
+
+var Strips = (function (_Array) {
+    _inherits(Strips, _Array);
+
+    function Strips() {
+        _classCallCheck(this, Strips);
+
+        _get(Object.getPrototypeOf(Strips.prototype), "constructor", this).call(this);
+    }
+
+    //Strips
+
+    _createClass(Strips, [{
+        key: "addNew",
+        value: function addNew() {
+            var newStripId = this.length;
+            this[newStripId] = new Strip(newStripId);
+            return newStripId;
+        }
+    }, {
+        key: "loadFromLocalStorage",
+        value: function loadFromLocalStorage() {
+            for (var i = 0; i < window.localStorage.length; ++i) {
+                var keyString = window.localStorage.key(i);
+                if (keyString.substr(0, 8) !== "stripId=") continue;
+                var stripId = parseInt(keyString.substr(8));
+                if (isNaN(stripId)) continue;
+                if (Math.floor(stripId) !== stripId) continue;
+                var stringified = window.localStorage.getItem(keyString);
+                if (typeof stringified !== "string") throw "loadStrips: stringified should be a string.";
+                var strip = new Strip().initByJson(stringified);
+                this[strip.stripId] = strip;
+            } //for
+        }
+        //loadFromLocalStorage
+    }]);
+
+    return Strips;
+})(Array);
+
+var x = new Strips();
+x.loadFromLocalStorage();
+
+var StripDivs = (function (_Array2) {
+    _inherits(StripDivs, _Array2);
+
+    function StripDivs(parentDiv) {
+        _classCallCheck(this, StripDivs);
+
+        if (!(parentDiv instanceof HTMLDivElement)) throw "StripDivs#constructor: expects HTMLDivElement.";
+        _get(Object.getPrototypeOf(StripDivs.prototype), "constructor", this).call(this);
+        this.parentDiv = parentDiv;
+    }
+
+    _createClass(StripDivs, [{
+        key: "createDiv",
+        value: function createDiv(strip) {
+            if (!(strip instanceof Strip)) throw "StripDivs#createDiv: expects Strip.";
+            var newDivStrip = document.createElement("div");
+            newDivStrip.classList.add("btn", "form-group", "col-xs-12", "divStrip", stripJson.className);
+            newDivStrip.addEventListener("dblclick", showMenu);
+            if (typeof stripJson.color === "string") {
+                newDivStrip.style.backgroundColor = "#" + stripJson.color;
+            } else {
+                newDivStrip.style.backgroundColor = "lightgray";
+            }
+
+            var spanStatus = document.createElement("span");
+            spanStatus.classList.add("col-xs-1", "status", "checked", "stripId");
+            spanStatus.innerHTML = stripJson.stripId;
+            newDivStrip.appendChild(spanStatus);
+
+            if (typeof stripJson.imgIcon === "string") {
+                var imgIcon = document.createElement("img");
+                imgIcon.src = stripJson.imgIcon;
+                imgIcon.classList.add("imgIcon");
+                newDivStrip.appendChild(imgIcon);
+            }
+
+            var inputStripTitle = document.createElement("input");
+            inputStripTitle.value = stripJson.stripTitle;
+            inputStripTitle.classList.add("btn");
+            inputStripTitle.readOnly = true;
+            newDivStrip.appendChild(inputStripTitle);
+
+            traverse(newDivStrip, function (x) {
+                x.dataset.stripId = stripJson.stripId;
+            });
+            this[strip.stripId] = newDivStrip;
+            return newDivStrip;
+        }
+        //createDiv
+    }]);
+
+    return StripDivs;
+})(Array);
+
+var strips = {};
+var stripDivs = new StripDivs(divStrips);
 
 function updateDueDateTime(event) {
     var stripId = event.target.dataset.stripId;
@@ -43,7 +178,7 @@ function updateDueDateTime(event) {
 }
 
 function loadStrips() {
-    strips = {};stripDivs = {};
+    stripDivs = {};
     for (var i = 0; i < window.localStorage.length; ++i) {
         var keyString = window.localStorage.key(i);
         if (keyString.substr(0, 8) !== "stripId=") continue;
