@@ -46,7 +46,7 @@ function Strip(stripId, stripTitle) {
 
     this.saveToLocalStorage = function(){
         const stringified = JSON.stringify(this);
-        winwow.localStorage.setItem("stripId=" + this.stripId, stringified);
+        window.localStorage.setItem("stripId=" + this.stripId, stringified);
     }
 
     this.loadFromLocalStorage = function(stripId){
