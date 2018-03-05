@@ -21,9 +21,9 @@ function Strip(stripId, stripTitle) {
     this.archived = undefined;
     this.dirty = undefined;
     this.sticky = undefined;
-    this.renewAfter = undefined;
-    this.renewEveryHours = undefined;
-    this.renewEveryDay = undefined;
+    this.renewAfter = [];
+    this.renewEveryHours = [];
+    this.renewEveryDay = [];
     this.dueDateTime = undefined;
     this.lastOpened = undefined;
     this.keywords = undefined;
