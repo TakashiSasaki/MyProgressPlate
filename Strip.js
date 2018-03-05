@@ -1,20 +1,9 @@
 
 "use strict";
 
-function Strip(stripId, stripTitle) {
-    if (typeof stripId === "number") {
-        this.stripId = stripId;
-        if (typeof stripTitle === "string") {
-            this.stripTitle = stripTitle;
-        } else {
-            this.stripTitle = "strip " + stripId;
-        }
-    } else if (stripId === undefined) {
-        this.stripId = undefined;
-        this.stripTitle = undefined;
-    } else {
-        throw "Strip: expects number or undefined.";
-    }
+function Strip() {
+    this.stripId = stripId;
+    this.stripTitle = stripTitle;
     this.imgIcon = undefined;
     this.className = undefined;
     this.stripTitle = undefined;
@@ -30,41 +19,37 @@ function Strip(stripId, stripTitle) {
     this.color = undefined;
     this.url = undefined;
 
-    this.initByJson = function (stringified) {
-        if (typeof stringified !== "string") throw "Strip#initByJson: expects a string.";
-        var parsed = JSON.parse(stringified);
-        try {
-            for (var i in parsed) {
-                this[i] = parsed[i];
-            }
-        } catch (e) {
-            console.log(e);
-            console.log("Strip#initByJson: i = " + i);
-        }
-        return this; // for method chaining
-    }; //initByJson
+    this.init = function(stripId, stripTitle){
+      if(typeof stripId !== "number") throw "Strip#init: stripId is expected to be an integer.";
+      if(typeof stripTitle !== "string") throw "Strip#init: stripTitle is expected to be a string.";
+      this.stripId = stripId;
+      this.stripoTitle = stripTitle;
+    }
 
     this.saveToLocalStorage = function(){
         const stringified = JSON.stringify(this);
         window.localStorage.setItem("stripId=" + this.stripId, stringified);
     }
 
-    this.loadFromLocalStorage = function(stripId){
-        if(stripId === undefined) stripId = this.stripId;
-        if(stripId === undefined) "Strip#loadFromLocalStorage: stripId is undefined.";
-        const stringified = window.localStorage.getItem("stripId="+stripId);
-        if(typeof stringified !== "string") throw "Strip#loadFromLocalStorage: stripId=" + stripId + " is not found in localStorage.";
+    this.loadFromLocalStorage = function(storageKey){
+        if(storageKey === undefined) throw "Strip#loadFromLocalStorage: expects string storageKey.";
+        if(keyString.substr(0,8) !== "stripId=") return null;
+        const stripId = parseInt(keyString.substr(8));
+        if(isNaN(stripId)) return null;        
+        const stringified = window.localStorage.getItem(storageKey);
+        if(typeof stringified !== "string") throw "Strip#loadFromLocalStorage: " + storageKey + " is not found in localStorage.";
         const parsed = JSON.parse(stringified);
+        if(stripId !== parsed.stripId) throw "Strip#loadFromLocalStorage: given storageKey and loaded stripId do not match.";
         for(var x in parsed) {
           this[x] = parsed[x];
         }
+        return parsed.stripId;
     }
 
-    this.archiveStrip = function(){
+    this.archive = function(){
         this.archived = true;
         this.saveToLocalStorage();
     }
-}
 
     Object.defineProperty(this, "initByJson", { enumerable: false });
     Object.defineProperty(this, "saveToLocalStorage", { enumerable: false });
