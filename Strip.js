@@ -60,9 +60,16 @@ function Strip(stripId, stripTitle) {
         }
     }
 
+    this.archiveStrip = function(){
+        this.archived = true;
+        this.saveToLocalStorage();
+    }
+}
+
     Object.defineProperty(this, "initByJson", { enumerable: false });
     Object.defineProperty(this, "saveToLocalStorage", { enumerable: false });
     Object.defineProperty(this, "loadFromLocalStorage", { enumerable: false });
+    Object.defineProperty(this, "archiveStrip", { enumerable: false });
     Object.preventExtensions(this);
     return this;
 }
