@@ -1,11 +1,15 @@
-<script src="https://rawgit.com/TakashiSasaki/MyProgressStrip/SurfacePro4/Strip.js"></script>
 <div class="panel">
     <ul class="nav nav-tabs">
         <li class="active" onclick="activateTab(event)"><a href="#divStrips">Strips</a></li>
-        <li class="active" onclick="activateTab(event)"><a href="#divOnline">online</a></li>
-        <li class="active" onclick="activateTab(event)"><a href="#divLocalStorage">localStorage</a></li>
-        <li class="active" onclick="activateTab(event)"><a href="#divLog">log</a></li>
+        <li class="" onclick="activateTab(event)"><a href="#divOnline">online</a></li>
+        <li class="" onclick="activateTab(event)"><a href="#divLocalStorage">localStorage</a></li>
+        <li class="" onclick="activateTab(event)"><a href="#divLog">log</a></li>
     </ul>
+    <div class="panel-heading">
+        <button class="btn btn-default" onclick="stripDivs.create()">
+            New
+        </button>
+    </div>
     <div class="panel-body">
         <div class="tab-content">
             <div class="tab-pane active" id="divStrips"></div>

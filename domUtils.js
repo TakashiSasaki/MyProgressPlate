@@ -2,6 +2,10 @@
 
 function checkByValues(name, values) {
     if (typeof name !== "string") throw "checkByValue: name should be a string.";
+    if (values === null || values === undefined) return;
+    if (!(values instanceof Array)) {
+        console.log("checkByValue: values should be an array.");
+    }
     var elements = document.getElementsByName(name);
     for (var i = 0; i < elements.length; ++i) {
         if (values.indexOf(elements[i].value) >= 0) {
