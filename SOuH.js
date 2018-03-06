@@ -8,13 +8,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Strips = (function (_Array) {
-    _inherits(Strips, _Array);
+var DomStrips = (function (_Array) {
+    _inherits(DomStrips, _Array);
 
-    function Strips() {
-        _classCallCheck(this, Strips);
+    function DomStrips() {
+        _classCallCheck(this, DomStrips);
 
-        _get(Object.getPrototypeOf(Strips.prototype), "constructor", this).call(this);
+        _get(Object.getPrototypeOf(DomStrips.prototype), "constructor", this).call(this);
         for (var i = 0; i < window.localStorage.length; ++i) {
             var keyString = window.localStorage.key(i);
             if (keyString === undefined) continue;
@@ -22,16 +22,16 @@ var Strips = (function (_Array) {
             var stripId = parseInt(keyString.substr(8));
             if (isNaN(stripId)) continue;
             var strip = new DomStrip(stripId);
-            if (typeof strip.stripId !== "number") throw "Strips#constructor: strip.stripId is not a number.";
+            if (typeof strip.stripId !== "number") throw "DomStrips#constructor: strip.stripId is not a number.";
             this[strip.stripId] = strip;
             this.length = Math.max(this.length, strip.stripId + 1);
         } //for
-        console.log("Strips#constructor: " + this.length + " strips loaded.");
+        console.log("DomStrips#constructor: " + this.length + " strips loaded.");
     }
 
-    //Strips
+    //DomStrips
 
-    _createClass(Strips, [{
+    _createClass(DomStrips, [{
         key: "create",
         value: function create() {
             var domStrip = new DomStrip(this.length);
@@ -42,12 +42,12 @@ var Strips = (function (_Array) {
     }, {
         key: "save",
         value: function save(stripId) {
-            if (typeof stripId !== "number") throw "Strips#saveToLocalStorage: stripId should be an integer.";
+            if (typeof stripId !== "number") throw "DomStrips#saveToLocalStorage: stripId should be an integer.";
             this[stripId].save();
         }
     }]);
 
-    return Strips;
+    return DomStrips;
 })(Array);
 
 var StripDivs = (function (_Array2) {
@@ -56,7 +56,7 @@ var StripDivs = (function (_Array2) {
     function StripDivs(strips) {
         _classCallCheck(this, StripDivs);
 
-        if (!(strips instanceof Strips)) throw "StripDivs#constructor: expects a Strip.";
+        if (!(strips instanceof DomStrips)) throw "StripDivs#constructor: expects a DomStrips.";
         _get(Object.getPrototypeOf(StripDivs.prototype), "constructor", this).call(this);
         this.strips = strips;
         for (var i in this.strips) {
@@ -67,9 +67,6 @@ var StripDivs = (function (_Array2) {
                 window.divStrips.appendChild(this[i]);
             } //if
         } //for
-        Object.defineProperty(this, "archive", { enumerable: false });
-        Object.defineProperty(this, "createNewStrip", { enumerable: false });
-        //Object.defineProperty(this, "show", { enumerable: false });
         var tmp = this;
         this.show();
     }
@@ -94,9 +91,6 @@ var StripDivs = (function (_Array2) {
             var domStrip = strips.create();
             this[domStrip.stripId] = domStrip.divStrip();
             this.length = Math.max(this.length, domStrip.stripId + 1);
-            //const newStripDiv = newStrip.buildDiv();
-            //this[newStrip.stripId] = newStripDiv;
-            //this.divStrips.appendChild(this[newStrip.stripId]);
             this.show();
         }
         //StripDivs#createNewStrip
@@ -116,6 +110,6 @@ var StripDivs = (function (_Array2) {
     return StripDivs;
 })(Array);
 
-var strips = new Strips();
+var strips = new DomStrips();
 var stripDivs = new StripDivs(strips);
 
