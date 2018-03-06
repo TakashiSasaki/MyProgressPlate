@@ -1,7 +1,11 @@
 "use strict";
 
 function StripBase() {
-    this.stripId = undefined;
+    this._oid = "2.25.233426837401770292559991393619474392241.2000";
+    this._idNumber = undefined; 
+    this._idPrefix = "Strip";
+    this._dirty = undefined;
+    this._order = undefined;
     this.stripTitle = undefined;
     this.imgIcon = undefined;
     this.className = undefined;
@@ -20,19 +24,12 @@ function StripBase() {
 }//StripBase
 
 class Strip extends StripBase{
-    constructor(stripId){
+    constructor(_idNumber){
+        if(typeof _idNumber !== "number") throw "Strip#constructor expects a number.";
         super();
-        this.stripId = stripId;
+        this._idNumber = _idNumber;
     }//Strip#constructor
     
-    init(stripId, stripTitle){
-        if(typeof stripId !== "number") throw "Strip#init: stripId is expected to be an integer.";
-        if(typeof stripTitle !== "string") throw "Strip#init: stripTitle is expected to be a string.";
-        this.stripId = stripId;
-        this.stripoTitle = stripTitle;
-        return this; // for method chaining
-    }//Strip#init
-
     update(){
         var candidate = this.lastOpened + 365 * 86400000;
         this.renewAfter.forEach(function(x){candidate = Math.min(candidate, this.lastOpened + x);});
@@ -56,40 +53,50 @@ class Strip extends StripBase{
 }//Strip
 
 class PersistentStrip extends Strip{
-    constructor(stripId) {
-        super(stripId);
-        const storageKey = "stripId=" + stripId;
-        const stringified = window.localStorage.getItem(storageKey);
-        if(typeof stringified == "string") {
+    constructor(idNumberOrStorageKey) {
+        if(typeof idNumberOrStorageKey === "number"){
+            super(idNumberOrStorageKey);
+            var storageKey = this._idPrefix + idNumberOrStorageKey;
+            const stringified = window.localStorage.getItem(storageKey);
+            if(typeof stringified === "string") {
+                const parsed = JSON.parse(stringified);
+                if(this._idNumber !== parsed._idNumber) throw "PersistentStrip#constructor: this._idNumber !== parsed._idNumber";
+                for(var x in parsed) {
+                  this[x] = parsed[x];
+                }
+            } else {
+                this.save();
+            }
+        } else {
+            const stringified = window.localStorage.getItem(idNumberOrStorageKey);
+            //console.log(stringified);
             const parsed = JSON.parse(stringified);
-            if(stripId !== parsed.stripId) throw "Strip#loadFromLocalStorage: given storageKey and loaded stripId do not match.";
+            super(parsed._idNumber);
             for(var x in parsed) {
               this[x] = parsed[x];
             }
-        } else {
-            this.save();
         }
     }//PersistentStrip#constructor
     
     save(){
         const stringified = JSON.stringify(this);
-        console.log("PersistentStrip#save: this.stripId = " + this.stripId);
-        window.localStorage.setItem("stripId=" + this.stripId, stringified);
+        console.log("PersistentStrip#save: this._idNumber = " + this._idNumber);
+        window.localStorage.setItem(this._idPrefix + this._idNumber, stringified);
         return this; // for method chaining
     }//PersistentStrip#save
 
 }//PersistentStrip
 
 class DomStrip extends PersistentStrip{
-    constructor(stripId){
-        super(stripId);
+    constructor(idNumberOrStorageKey){
+        super(idNumberOrStorageKey);
     }//constructor
     
     openUrl(){
         const strip = this;
         setTimeout(function(){
             if(typeof url === "string"){
-                var newWindow = window.open(url, "window" + strip.stripId);
+                var newWindow = window.open(url, "window" + strip._idNumber);
                 setTimeout(function(){
                     if(typeof newWindow === "object") {
                         try{
@@ -117,8 +124,8 @@ class DomStrip extends PersistentStrip{
         }
     
         const spanStatus = document.createElement("span");
-        spanStatus.classList.add("col-xs-1","status", "checked", "stripId");
-        spanStatus.innerHTML = this.stripId;
+        spanStatus.classList.add("col-xs-1","status", "checked", "_idNumber");
+        spanStatus.innerHTML = this._idNumber;
         divStrip.appendChild(spanStatus);
         
         if(typeof this.imgIcon === "string") {
@@ -134,8 +141,8 @@ class DomStrip extends PersistentStrip{
         inputStripTitle.readOnly = true;
         divStrip.appendChild(inputStripTitle);
      
-        const stripId = this.stripId;
-        traverse(divStrip, function(x){x.dataset.stripId = stripId;});
+        const _idNumber = this._idNumber;
+        traverse(divStrip, function(x){x.dataset._idNumber = _idNumber;});
         return divStrip;
     }//divStrip
     
@@ -148,13 +155,13 @@ class DomStrip extends PersistentStrip{
         window.inputColor.value = strip.color;
         window.inputColor.placeholder = strip.color;
         window.inputColor.style.backgroundColor = "#" + strip.color;
-        window.spanStripId.innerHTML=stripId;
+        window.spanStripId.innerHTML=this._idNumber;
         checkByValues("renewAfter", strip.renewAfter);
         checkByValues("renewEveryHours", strip.renewEveryHours);
         if(!(strip.renewEveryDay) instanceof Array) strip.renewEveryDay = [];
         checkByValues("renewEveryDay", strip.renewEveryDay);
-        const stripId = this.stripId;
-        traverse(window.divMenu, function(x){x.dataset.stripId = stripId;});
+        const _idNumber = this._idNumber;
+        traverse(window.divMenu, function(x){x.dataset._idNumber = _idNumber;});
         return window.divMenu;
     }//divMenu
 }//DomStrip

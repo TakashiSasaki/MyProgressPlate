@@ -3,28 +3,27 @@ class DomStrips extends Array {
         super();
         for(var i=0; i<window.localStorage.length; ++i) {
             const keyString = window.localStorage.key(i);
-            if(keyString === undefined) continue;
-            if(keyString.substr(0,8) !== "stripId=") continue;
-            const stripId = parseInt(keyString.substr(8));
-            if(isNaN(stripId)) continue;        
-            const strip = new DomStrip(stripId);
-            if(typeof strip.stripId !== "number") throw "DomStrips#constructor: strip.stripId is not a number.";
-            this[strip.stripId] = strip;
-            this.length = Math.max(this.length, strip.stripId+1);
+            try {
+                const domStrip = new DomStrip(keyString);
+                this[domStrip._idNumber] = domStrip;
+                this.length = Math.max(this.length, domStrip._idNumber + 1);
+            } catch (e) {
+                //console.log("DomStrips#constructor: " + e);
+            }
         }//for
         console.log("DomStrips#constructor: " + this.length + " strips loaded.");
     }
     
     create() {
         const domStrip = new DomStrip(this.length);
-        this[domStrip.stripId] = domStrip;
-        this.length = Math.max(this.length, domStrip.stripId+1);
-        return this[domStrip.stripId];
+        this[domStrip._idNumber] = domStrip;
+        this.length = Math.max(this.length, domStrip._idNumber + 1);
+        return this[domStrip._idNumber];
     }
     
-    save(stripId){
-        if(typeof stripId !== "number") throw "DomStrips#saveToLocalStorage: stripId should be an integer.";
-        this[stripId].save();
+    save(_idNumber){
+        if(typeof _idNumber !== "number") throw "DomStrips#save: _idNumber should be an integer.";
+        this[_idNumber].save();
     }
 }//DomStrips
 
@@ -46,19 +45,19 @@ class StripDivs extends Array {
         this.show();
     }//StripDivs#constructor
 
-    archive(stripId){
-        if(stripId !== "number") throw "StripDivs#remove: expects a number.";
-        this.strips.archive(stripId);
-        this[stripId].remove();
-        this[stripId] = undefined;
-        this.length = Math.max(this.length, stripId+1);
+    archive(_idNumber){
+        if(_idNumber !== "number") throw "StripDivs#remove: expects a number.";
+        this.strips.archive(_idNumber);
+        this[_idNumber].remove();
+        this[_idNumber] = undefined;
+        this.length = Math.max(this.length, _idNumber + 1);
         this.show();
     }//StripDivs#archive
     
     create(){
         const domStrip = strips.create();
-        this[domStrip.stripId] = domStrip.divStrip();
-        this.length = Math.max(this.length, domStrip.stripId+1);
+        this[domStrip._idNumber] = domStrip.divStrip();
+        this.length = Math.max(this.length, domStrip._idNumber + 1);
         this.show();
     }//StripDivs#createNewStrip
 
