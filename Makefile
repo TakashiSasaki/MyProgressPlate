@@ -1,17 +1,18 @@
 .PHONY: pull-gas pull-jsdoit clean-jsdoit
 .SUFFIXES: js html css
+.PRECIOUS: %.js %.html %.css
 
 pull-gas:
 	clasp pull
 
-JSDOITFILES=SOuH.js SOuH.css SOuH.html domUtils.js domUtils.css domUtils.html DateUtility.js DateUtility.css DateUtility.html
+JSDOITFILES=SOuH.js domUtils.js DateUtility.js Strip.js
 
 clean-jsdoit:
-	rm -rf $(JSDOITFILES)
+	rm -rf SOuH.* domUtils.* DateUtility.* Strip.*
 
-pull-jsdoit: clean-jsdoit $(JSDOITFILES)
+pull-jsdoit: $(JSDOITFILES)
 
-%.js: 
+%.js: %.html %.css
 	curl -o $@ http://jsrun.it/TakashiSasaki/$*/js
 
 %.html:
